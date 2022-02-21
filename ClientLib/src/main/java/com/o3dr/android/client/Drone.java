@@ -607,7 +607,7 @@ public class Drone {
         return asyncScheduler;
     }
 
-    void notifyAttributeUpdated(final String attributeEvent, final Bundle extras) {
+    public void notifyAttributeUpdated(final String attributeEvent, final Bundle extras) {
         //Update the bundle classloader
         if (extras != null) {
             extras.setClassLoader(contextClassLoader);
