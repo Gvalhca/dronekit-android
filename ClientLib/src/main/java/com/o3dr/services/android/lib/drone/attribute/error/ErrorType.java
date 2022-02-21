@@ -3,7 +3,7 @@ package com.o3dr.services.android.lib.drone.attribute.error;
 import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.StringRes;
+import androidx.annotation.StringRes;
 import android.text.TextUtils;
 
 import com.o3dr.android.client.R;

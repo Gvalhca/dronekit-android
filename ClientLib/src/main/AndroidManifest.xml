@@ -2,7 +2,7 @@
           package="com.o3dr.android.client">
 
     <uses-permission android:name="android.permission.INTERNET"/>
-
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
@@ -40,7 +40,8 @@
             android:name="org.droidplanner.services.android.impl.ui.activity.UsbIntentReceiver"
             android:launchMode="singleInstance"
             android:noHistory="true"
-            android:excludeFromRecents="true">
+            android:excludeFromRecents="true"
+            android:exported="false">
             <!-- USB connection  intent -->
             <intent-filter>
                 <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"/>
@@ -53,7 +54,8 @@
 
         <service
             android:name="org.droidplanner.services.android.impl.api.DroidPlannerService"
-            android:enabled="false">
+            android:enabled="false"
+            android:exported="false">
 
             <!-- Filter and meta data for the Tower lib runtime -->
             <intent-filter>

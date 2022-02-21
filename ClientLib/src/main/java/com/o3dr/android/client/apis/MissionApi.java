@@ -2,7 +2,7 @@ package com.o3dr.android.client.apis;
 
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.o3dr.android.client.Drone;
 import com.o3dr.services.android.lib.drone.mission.Mission;

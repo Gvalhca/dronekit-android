@@ -3,7 +3,7 @@ package org.droidplanner.services.android.impl.core.MAVLink.connection;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.util.Pair;
+import androidx.core.util.Pair;
 
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.Parser;

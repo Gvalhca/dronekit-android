@@ -2,16 +2,23 @@ package org.droidplanner.services.android.impl.api;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.LocalBroadcastManager;
+
+import androidx.annotation.RequiresApi;
+import androidx.core.app.NotificationCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import android.text.TextUtils;
 
 import com.o3dr.android.client.R;
@@ -36,7 +43,7 @@ import timber.log.Timber;
  */
 public class DroidPlannerService extends Service {
 
-        /**
+    /**
      * Status bar notification id
      */
     private static final int FOREGROUND_ID = 101;
@@ -122,11 +129,10 @@ public class DroidPlannerService extends Service {
             final DroneManager temp = DroneManager.generateDroneManager(getApplicationContext(), connParams, new Handler(Looper.getMainLooper()));
 
             droneMgr = droneManagers.putIfAbsent(connParams, temp);
-            if(droneMgr == null){
+            if (droneMgr == null) {
                 Timber.d("Generating new drone manager.");
                 droneMgr = temp;
-            }
-            else{
+            } else {
                 temp.destroy();
             }
         }
@@ -212,27 +218,54 @@ public class DroidPlannerService extends Service {
         lbm = LocalBroadcastManager.getInstance(context);
         this.cameraInfoLoader = new CameraInfoLoader(context);
 
-        updateForegroundNotification();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            updateForegroundNotification();
+        else
+            startForeground(1, new Notification());
     }
 
-    @SuppressLint("NewApi")
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void updateForegroundNotification() {
-        final Context context = getApplicationContext();
+        String NOTIFICATION_CHANNEL_ID = "com.gvalhca.custom-dronekit-android";
+        String channelName = "Droid Planner Service";
+        NotificationChannel chan = new NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_NONE);
+        chan.setLightColor(Color.BLUE);
+        chan.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        assert manager != null;
+        manager.createNotificationChannel(chan);
 
-        //Put the service in the foreground
-        final NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(context)
-                .setContentTitle("DroneKit-Android")
-                .setPriority(NotificationCompat.PRIORITY_MIN)
-                .setSmallIcon(R.drawable.ic_stat_notify);
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)                .setContentTitle("App is running in background")
+                .setPriority(NotificationManager.IMPORTANCE_MIN)
+                .setCategory(Notification.CATEGORY_SERVICE);
 
         final int connectedCount = droneApiStore.size();
         if (connectedCount > 1) {
-            notifBuilder.setContentText(connectedCount + " connected apps");
+            notificationBuilder.setContentText(connectedCount + " connected apps");
         }
 
-        final Notification notification = notifBuilder.build();
+        Notification notification = notificationBuilder.build();
         startForeground(FOREGROUND_ID, notification);
     }
+
+//    @SuppressLint("NewApi")
+//    private void updateForegroundNotification() {
+//        final Context context = getApplicationContext();
+//
+//        //Put the service in the foreground
+//        final NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(context)
+//                .setContentTitle("DroneKit-Android")
+//                .setPriority(NotificationCompat.PRIORITY_MIN)
+//                .setSmallIcon(R.drawable.ic_stat_notify);
+//
+//        final int connectedCount = droneApiStore.size();
+//        if (connectedCount > 1) {
+//            notifBuilder.setContentText(connectedCount + " connected apps");
+//        }
+//
+//        final Notification notification = notifBuilder.build();
+//        startForeground(FOREGROUND_ID, notification);
+//    }
 
     @Override
     public void onDestroy() {
@@ -276,10 +309,11 @@ public class DroidPlannerService extends Service {
 
     /**
      * Toggles the DroidPlannerService component
+     *
      * @param context
      * @param enable
      */
-    public static void enableDroidPlannerService(Context context, boolean enable){
+    public static void enableDroidPlannerService(Context context, boolean enable) {
         final ComponentName serviceComp = new ComponentName(context, DroidPlannerService.class);
         final int newState = enable ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED
                 : PackageManager.COMPONENT_ENABLED_STATE_DISABLED;

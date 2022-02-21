@@ -1,7 +1,7 @@
 package org.droidplanner.sample.hellodrone.video;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 
 import org.droidplanner.sample.hellodrone.R;
 
