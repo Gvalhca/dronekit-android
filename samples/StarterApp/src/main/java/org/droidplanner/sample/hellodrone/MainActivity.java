@@ -2,6 +2,8 @@ package org.droidplanner.sample.hellodrone;
 
 import android.content.Context;
 import android.graphics.SurfaceTexture;
+import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -18,6 +20,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.hoho.android.usbserial.driver.CdcAcmSerialDriver;
+import com.hoho.android.usbserial.driver.ProbeTable;
+import com.hoho.android.usbserial.driver.UsbSerialDriver;
+import com.hoho.android.usbserial.driver.UsbSerialProber;
 import com.o3dr.android.client.ControlTower;
 import com.o3dr.android.client.Drone;
 import com.o3dr.android.client.apis.ControlApi;
@@ -49,9 +55,14 @@ import com.o3dr.services.android.lib.model.AbstractCommandListener;
 import com.o3dr.services.android.lib.model.SimpleCommandListener;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.o3dr.android.client.apis.ExperimentalApi.getApi;
+
+import org.droidplanner.services.android.impl.communication.connection.usb.UsbCDCConnection;
 
 public class MainActivity extends AppCompatActivity implements DroneListener, TowerListener, LinkListener {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -192,6 +203,8 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
         mediaCodecManager = new MediaCodecManager(mediaCodecHandler);
 
         mainHandler = new Handler(getApplicationContext().getMainLooper());
+        refresh();
+
     }
 
     @Override
@@ -301,19 +314,37 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
     // ==========================================================
 
     public void onBtnConnectTap(View view) {
-        if (this.drone.isConnected()) {
-            this.drone.disconnect();
-        } else {
-            Spinner connectionSelector = (Spinner) findViewById(R.id.selectConnectionType);
-            int selectedConnectionType = connectionSelector.getSelectedItemPosition();
+        if (devicesList.size()>0) {
+            Spinner spinner = (Spinner)findViewById(R.id.selectDevice);
+            String text = spinner.getSelectedItem().toString();
 
-            ConnectionParameter connectionParams = selectedConnectionType == ConnectionType.TYPE_USB
-                ? ConnectionParameter.newUsbConnection(null)
-                : ConnectionParameter.newUdpConnection(null);
 
-            this.drone.connect(connectionParams);
+            UsbCDCConnection.productId = 0;
+            UsbCDCConnection.vendorId = 0;
+
+            for (int i=0;i<devicesList.size();i++){
+                if (devicesList.get(i).mProductName.equals(text)){
+                    UsbCDCConnection.productId = Integer.parseInt(devicesList.get(i).mProductId);
+                    UsbCDCConnection.vendorId = Integer.parseInt(devicesList.get(i).mVendorId);
+                }
+            }
+
+            System.out.println("productId: "+UsbCDCConnection.productId);
+            System.out.println("vendorId: "+UsbCDCConnection.vendorId);
+
+            if (this.drone.isConnected()) {
+                this.drone.disconnect();
+            } else {
+                Spinner connectionSelector = (Spinner) findViewById(R.id.selectConnectionType);
+                int selectedConnectionType = connectionSelector.getSelectedItemPosition();
+
+                ConnectionParameter connectionParams = selectedConnectionType == ConnectionType.TYPE_USB
+                        ? ConnectionParameter.newUsbConnection(null)
+                        : ConnectionParameter.newUdpConnection(null);
+
+                this.drone.connect(connectionParams);
+            }
         }
-
     }
 
     public void onFlightModeSelected(View view) {
@@ -335,6 +366,100 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
                 alertUser("Vehicle mode change timed out.");
             }
         });
+    }
+
+    static class CustomProber {
+
+        static UsbSerialProber getCustomProber() {
+            ProbeTable customTable = new ProbeTable();
+            customTable.addProduct(0x16d0, 0x087e, CdcAcmSerialDriver.class); // e.g. Digispark CDC
+            return new UsbSerialProber(customTable);
+        }
+
+    }
+    static class ListItem {
+        UsbDevice device;
+        int port;
+        UsbSerialDriver driver;
+
+        ListItem(UsbDevice device, int port, UsbSerialDriver driver) {
+            this.device = device;
+            this.port = port;
+            this.driver = driver;
+        }
+    }
+    private final ArrayList<ListItem> listItems = new ArrayList<>();
+
+    private class DeviceHolder{
+        public String mProductName;
+        public String mVendorId;
+        public String mProductId;
+        DeviceHolder(String _mProductName,String _mVendorId,String _mProductId){
+            this.mProductName = _mProductName;
+            this.mVendorId = _mVendorId;
+            this.mProductId = _mProductId;
+        }
+    }
+
+    private ArrayList<DeviceHolder> devicesList = new ArrayList<>();
+
+    public void onRefreshButtonTap(View view) {
+        refresh();
+    }
+
+    public void refresh(){
+        System.out.println("REFRESH");
+        UsbManager usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);//(UsbManager) getActivity().getSystemService(Context.USB_SERVICE);
+        UsbSerialProber usbDefaultProber = UsbSerialProber.getDefaultProber();
+        UsbSerialProber usbCustomProber = CustomProber.getCustomProber();
+        listItems.clear();
+        for(UsbDevice device : usbManager.getDeviceList().values()) {
+            UsbSerialDriver driver = usbDefaultProber.probeDevice(device);
+            if(driver == null) {
+                driver = usbCustomProber.probeDevice(device);
+            }
+            if(driver != null) {
+                for(int port = 0; port < driver.getPorts().size(); port++)
+                    listItems.add(new ListItem(device, port, driver));
+            } else {
+                listItems.add(new ListItem(device, 0, null));
+            }
+        }
+        devicesList.clear();
+        for (ListItem item: listItems
+        ) {
+            String vendorRegex = "mVendorId=([^,]+),";
+            String productIdRegex = "mProductId=([^,]+),";
+            String productNameRegex = "mProductName=([^,]+),";
+            String [] patterns  = new String [] {productNameRegex, vendorRegex, productIdRegex};
+            String [] results = new String[3];
+            boolean allWasFound = true;
+            for (int i=0;i<3;i++){
+                Pattern r = Pattern.compile(patterns[i]);
+                Matcher m = r.matcher(item.device.toString());
+                if (m.find()){
+                    results[i] = m.group(1);
+                }
+                else{
+                    allWasFound = false;
+                }
+            }
+            if (allWasFound) {
+                System.out.println("###################");
+                for (int i=0;i<3;i++) {
+                    System.out.println(results[i]);
+                }
+
+                devicesList.add(new DeviceHolder(results[0], results[1], results[2]));
+            }
+        }
+        Spinner dropdown = findViewById(R.id.selectDevice);
+        String[] items = new String[devicesList.size()];
+        for (int i=0;i<devicesList.size();i++){
+            items[i] = devicesList.get(i).mProductName;
+        }
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, items);
+        dropdown.setAdapter(adapter);
     }
 
     public void onArmButtonTap(View view) {

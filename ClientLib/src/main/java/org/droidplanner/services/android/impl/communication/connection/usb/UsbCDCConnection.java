@@ -28,9 +28,11 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import timber.log.Timber;
 
-class UsbCDCConnection extends UsbConnection.UsbConnectionImpl {
+public class UsbCDCConnection extends UsbConnection.UsbConnectionImpl {
     private static final String TAG = UsbCDCConnection.class.getSimpleName();
     private static final String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
+    public static int vendorId = 0x1209;
+    public static int productId = 0x5741;
 
     private static final IntentFilter intentFilter = new IntentFilter(ACTION_USB_PERMISSION);
 
@@ -118,7 +120,8 @@ class UsbCDCConnection extends UsbConnection.UsbConnectionImpl {
         // Get UsbManager from Android.
         UsbManager manager = (UsbManager) mContext.getSystemService(Context.USB_SERVICE);
         ProbeTable customTable = new ProbeTable();
-        customTable.addProduct(0x1209, 0x5741, CdcAcmSerialDriver.class);
+        customTable.addProduct(vendorId, productId, CdcAcmSerialDriver.class);
+        //customTable.addProduct(0x1209, 0x5741, CdcAcmSerialDriver.class);
 //        customTable.addProduct(0x1234, 0x0002, CdcAcmSerialDriver.class);
 
         UsbSerialProber prober = new UsbSerialProber(customTable);
@@ -148,7 +151,9 @@ class UsbCDCConnection extends UsbConnection.UsbConnectionImpl {
 
         // Find the first available driver.
         ProbeTable customTable = new ProbeTable();
-        customTable.addProduct(0x1209, 0x5741, CdcAcmSerialDriver.class);
+        //customTable.addProduct(0x1209, 0x5741, CdcAcmSerialDriver.class);
+        customTable.addProduct(vendorId, productId, CdcAcmSerialDriver.class);
+
         UsbSerialProber prober = new UsbSerialProber(customTable);
         final UsbSerialDriver serialDriver = prober.findAllDrivers(manager).get(0);
 

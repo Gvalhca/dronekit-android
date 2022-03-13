@@ -23,16 +23,16 @@
 
             <RelativeLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="171dp"
                 android:padding="10dp">
 
                 <Button
                     android:id="@+id/btnConnect"
                     android:layout_width="150dp"
                     android:layout_height="wrap_content"
+                    android:layout_below="@+id/connectionTypeLabel"
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentRight="true"
-                    android:layout_below="@+id/connectionTypeLabel"
                     android:onClick="onBtnConnectTap"
                     android:text="Connect" />
 
@@ -40,9 +40,24 @@
                     android:id="@+id/selectConnectionType"
                     android:layout_width="120dp"
                     android:layout_height="44dp"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
                     android:layout_below="@+id/connectionTypeLabel"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_toLeftOf="@+id/btnConnect"
+                    android:entries="@array/drone_connection_types"
+                    android:spinnerMode="dropdown" />
+
+                <Spinner
+                    android:id="@+id/selectDevice"
+                    android:layout_width="208dp"
+                    android:layout_height="41dp"
+                    android:layout_below="@+id/selectConnectionType"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginStart="0dp"
+                    android:layout_marginLeft="0dp"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginRight="2dp"
                     android:layout_toLeftOf="@+id/btnConnect"
                     android:entries="@array/drone_connection_types"
                     android:spinnerMode="dropdown" />
@@ -52,10 +67,21 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
-                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="10dp"
                     android:layout_marginBottom="10dp"
                     android:text="Connection Type"
                     android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <Button
+                    android:id="@+id/refreshButton"
+                    android:layout_width="137dp"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/btnConnect"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginTop="9dp"
+                    android:layout_marginEnd="0dp"
+                    android:onClick="onRefreshButtonTap"
+                    android:text="Refresh" />
 
             </RelativeLayout>
 
@@ -298,6 +324,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="380dp"/>
+
+                <Button
+                    android:id="@+id/button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Button" />
 
             </LinearLayout>
 
