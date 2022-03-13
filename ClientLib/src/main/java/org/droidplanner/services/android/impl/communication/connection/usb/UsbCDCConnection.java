@@ -6,11 +6,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.hoho.android.usbserial.driver.CdcAcmSerialDriver;
+import com.hoho.android.usbserial.driver.ProbeTable;
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
+import com.hoho.android.usbserial.driver.UsbSerialPort;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
 
 import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
@@ -30,7 +34,7 @@ class UsbCDCConnection extends UsbConnection.UsbConnectionImpl {
 
     private static final IntentFilter intentFilter = new IntentFilter(ACTION_USB_PERMISSION);
 
-    private final AtomicReference<UsbSerialDriver> serialDriverRef = new AtomicReference<>();
+    private final AtomicReference<UsbSerialPort> serialPortRef = new AtomicReference<>();
 
     private final PendingIntent usbPermissionIntent;
 
@@ -39,27 +43,29 @@ class UsbCDCConnection extends UsbConnection.UsbConnectionImpl {
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
             if (ACTION_USB_PERMISSION.equals(action)) {
-                removeWatchdog();
-                UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                synchronized (this) {
+                    removeWatchdog();
+                    UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
 
-                if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
-                    if (device != null) {
-                        //call method to set up device communication
-                        try {
-                            openUsbDevice(device, extrasHolder.get());
-                        } catch (IOException e) {
-                            Log.e(TAG, e.getMessage(), e);
+                    if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
+                        if (device != null) {
+                            //call method to set up device communication
+                            try {
+                                openUsbDevice(device, extrasHolder.get());
+                            } catch (IOException e) {
+                                Log.e(TAG, e.getMessage(), e);
+                            }
+                        } else {
+                            LinkConnectionStatus connectionStatus = LinkConnectionStatus
+                                    .newFailedConnectionStatus(LinkConnectionStatus.LINK_UNAVAILABLE, "Unable to access usb device.");
+                            onUsbConnectionStatus(connectionStatus);
                         }
                     } else {
+                        Log.d(TAG, "permission denied for device " + device);
                         LinkConnectionStatus connectionStatus = LinkConnectionStatus
-                            .newFailedConnectionStatus(LinkConnectionStatus.LINK_UNAVAILABLE, "Unable to access usb device.");
+                                .newFailedConnectionStatus(LinkConnectionStatus.PERMISSION_DENIED, "USB Permission denied.");
                         onUsbConnectionStatus(connectionStatus);
                     }
-                } else {
-                    Log.d(TAG, "permission denied for device " + device);
-                    LinkConnectionStatus connectionStatus = LinkConnectionStatus
-                        .newFailedConnectionStatus(LinkConnectionStatus.PERMISSION_DENIED, "USB Permission denied.");
-                    onUsbConnectionStatus(connectionStatus);
                 }
             }
         }
@@ -70,7 +76,7 @@ class UsbCDCConnection extends UsbConnection.UsbConnectionImpl {
         public void run() {
             Log.d(TAG, "Permission request timeout.");
             LinkConnectionStatus connectionStatus = LinkConnectionStatus
-                .newFailedConnectionStatus(LinkConnectionStatus.TIMEOUT, "Unable to get usb access.");
+                    .newFailedConnectionStatus(LinkConnectionStatus.TIMEOUT, "Unable to get usb access.");
             onUsbConnectionStatus(connectionStatus);
 
             removeWatchdog();
@@ -92,7 +98,7 @@ class UsbCDCConnection extends UsbConnection.UsbConnectionImpl {
     private void unregisterUsbPermissionBroadcastReceiver() {
         try {
             mContext.unregisterReceiver(broadcastReceiver);
-        }catch(IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             Timber.e(e, "Receiver was not registered.");
         }
     }
@@ -111,16 +117,19 @@ class UsbCDCConnection extends UsbConnection.UsbConnectionImpl {
 
         // Get UsbManager from Android.
         UsbManager manager = (UsbManager) mContext.getSystemService(Context.USB_SERVICE);
+        ProbeTable customTable = new ProbeTable();
+        customTable.addProduct(0x1209, 0x5741, CdcAcmSerialDriver.class);
+//        customTable.addProduct(0x1234, 0x0002, CdcAcmSerialDriver.class);
 
-        //Get the list of available devices
-        List<UsbDevice> availableDevices = UsbSerialProber.getAvailableSupportedDevices(manager);
+        UsbSerialProber prober = new UsbSerialProber(customTable);
+        List<UsbSerialDriver> availableDevices = prober.findAllDrivers(manager);
         if (availableDevices.isEmpty()) {
             Log.d(TAG, "No Devices found");
             throw new IOException("No Devices found");
         }
 
         //Pick the first device
-        UsbDevice device = availableDevices.get(0);
+        UsbDevice device = availableDevices.get(0).getDevice();
         if (manager.hasPermission(device)) {
             openUsbDevice(device, extras);
         } else {
@@ -138,24 +147,35 @@ class UsbCDCConnection extends UsbConnection.UsbConnectionImpl {
         UsbManager manager = (UsbManager) mContext.getSystemService(Context.USB_SERVICE);
 
         // Find the first available driver.
-        final UsbSerialDriver serialDriver = UsbSerialProber.openUsbDevice(manager, device);
+        ProbeTable customTable = new ProbeTable();
+        customTable.addProduct(0x1209, 0x5741, CdcAcmSerialDriver.class);
+        UsbSerialProber prober = new UsbSerialProber(customTable);
+        final UsbSerialDriver serialDriver = prober.findAllDrivers(manager).get(0);
 
+        UsbSerialPort port = null;
         if (serialDriver == null) {
             Log.d(TAG, "No Devices found");
             throw new IOException("No Devices found");
         } else {
             Log.d(TAG, "Opening using Baud rate " + mBaudRate);
             try {
-                serialDriver.open();
-                serialDriver.setParameters(mBaudRate, 8, UsbSerialDriver.STOPBITS_1, UsbSerialDriver.PARITY_NONE);
+                UsbDeviceConnection connection = manager.openDevice(serialDriver.getDevice());
+                if (connection == null) {
+                    manager.requestPermission(device, usbPermissionIntent);
+                    return;
+                }
+                port = serialDriver.getPorts().get(0); // Most devices have just one port (port 0)
+                port.open(connection);
+                port.setParameters(mBaudRate, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
 
-                serialDriverRef.set(serialDriver);
+                serialPortRef.set(port);
 
                 onUsbConnectionOpened(extras);
             } catch (IOException e) {
                 Log.e(TAG, "Error setting up device: " + e.getMessage(), e);
                 try {
-                    serialDriver.close();
+                    if (port != null)
+                        port.close();
                 } catch (IOException e2) {
                     // Ignore.
                 }
@@ -167,13 +187,13 @@ class UsbCDCConnection extends UsbConnection.UsbConnectionImpl {
     protected int readDataBlock(byte[] readData) throws IOException {
         // Read data from driver. This call will return up to readData.length bytes.
         // If no data is received it will timeout after 200ms (as set by parameter 2)
-        final UsbSerialDriver serialDriver = serialDriverRef.get();
-        if(serialDriver == null)
+        final UsbSerialPort serialPort = serialPortRef.get();
+        if (serialPort == null)
             throw new IOException("Device is unavailable.");
 
         int iavailable = 0;
         try {
-            iavailable = serialDriver.read(readData, 200);
+            iavailable = serialPort.read(readData, 200);
         } catch (NullPointerException e) {
             final String errorMsg = "Error Reading: " + e.getMessage()
                     + "\nAssuming inaccessible USB device.  Closing connection.";
@@ -191,10 +211,11 @@ class UsbCDCConnection extends UsbConnection.UsbConnectionImpl {
         // Write data to driver. This call should write buffer.length bytes
         // if data cant be sent , then it will timeout in 500ms (as set by
         // parameter 2)
-        final UsbSerialDriver serialDriver = serialDriverRef.get();
-        if (serialDriver != null) {
+        final UsbSerialPort serialPort = serialPortRef.get();
+
+        if (serialPort != null) {
             try {
-                serialDriver.write(buffer, 500);
+                serialPort.write(buffer, 500);
             } catch (IOException e) {
                 Log.e(TAG, "Error Sending: " + e.getMessage(), e);
             }
@@ -205,10 +226,10 @@ class UsbCDCConnection extends UsbConnection.UsbConnectionImpl {
     protected void closeUsbConnection() throws IOException {
         unregisterUsbPermissionBroadcastReceiver();
 
-        final UsbSerialDriver serialDriver = serialDriverRef.getAndSet(null);
-        if (serialDriver != null) {
+        final UsbSerialPort serialPort = serialPortRef.getAndSet(null);
+        if (serialPort != null) {
             try {
-                serialDriver.close();
+                serialPort.close();
             } catch (IOException e) {
                 Log.e(TAG, e.getMessage(), e);
             }

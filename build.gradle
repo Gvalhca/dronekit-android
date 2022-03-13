@@ -114,5 +114,6 @@ allprojects {
                 password getMavenApiKey()
             }
         }
+        maven { url 'https://jitpack.io' }
     }
 }
