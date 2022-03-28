@@ -43,7 +43,7 @@ public class NetworkUtils {
     }
 
     public static String getCurrentWifiLink(Context context) {
-        final WifiManager wifiMgr = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        final WifiManager wifiMgr = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
         final WifiInfo connectedWifi = wifiMgr.getConnectionInfo();
         final String connectedSSID = connectedWifi == null ? null : connectedWifi.getSSID().replace("\"", "");

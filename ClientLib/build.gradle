@@ -106,25 +106,25 @@ dependencies {
     implementation 'com.android.support:multidex:2.0.1'
     api 'com.jakewharton.timber:timber:3.1.0'
 
-    api "com.google.android.gms:play-services-base:${play_services_version}"
-    api "com.google.android.gms:play-services-location:${play_services_version}"
+    implementation "com.google.android.gms:play-services-base:${play_services_version}"
+    implementation "com.google.android.gms:play-services-location:${play_services_version}"
 
     //Java semver library
-    api 'com.github.zafarkhaja:java-semver:0.9.0'
+    implementation 'com.github.zafarkhaja:java-semver:0.9.0'
 
-    api 'com.jcraft:jsch:0.1.51'
+    implementation 'com.jcraft:jsch:0.1.51'
 
     //MP4 generation library
-    api 'com.googlecode.mp4parser:isoparser:1.1.7'
+    implementation 'com.googlecode.mp4parser:isoparser:1.1.7'
 
-//    api 'org.droidplanner.android:usb-serial-android:0.1.0'
+//    implementation 'org.droidplanner.android:usb-serial-android:0.1.0'
     implementation 'com.github.mik3y:usb-serial-for-android:3.4.3'
 
-    debugApi project(':Mavlink')
+    debugImplementation project(':Mavlink')
 //    sitlCompile project(':Mavlink')
 
-    api files('libs/Mavlink.jar')
-    api files('libs/d2xx.jar')
+    implementation files('libs/Mavlink.jar')
+    implementation files('libs/d2xx.jar')
 
     androidTestImplementation 'junit:junit:4.12'
     androidTestImplementation "org.robolectric:robolectric:3.0"

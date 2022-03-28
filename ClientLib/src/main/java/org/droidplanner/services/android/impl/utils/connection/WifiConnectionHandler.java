@@ -1,10 +1,14 @@
 package org.droidplanner.services.android.impl.utils.connection;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.DhcpInfo;
 import android.net.LinkProperties;
@@ -21,6 +25,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.Toast;
+
+import androidx.core.app.ActivityCompat;
 
 import com.o3dr.services.android.lib.gcs.link.LinkConnectionStatus;
 
@@ -75,7 +81,8 @@ public class WifiConnectionHandler {
                     break;
 
                 case WifiManager.SUPPLICANT_STATE_CHANGED_ACTION:
-                    SupplicantState supState = intent.getParcelableExtra(WifiManager.EXTRA_NEW_STATE);
+//                    SupplicantState supState = intent.getParcelableExtra(WifiManager.EXTRA_NEW_STATE);
+                    SupplicantState supState = wifiMgr.getConnectionInfo().getSupplicantState();
                     String ssid = NetworkUtils.getCurrentWifiLink(context);
 
                     int supplicationError = intent.getIntExtra(WifiManager.EXTRA_SUPPLICANT_ERROR, -1);
@@ -94,12 +101,12 @@ public class WifiConnectionHandler {
                 case WifiManager.NETWORK_STATE_CHANGED_ACTION:
                     NetworkInfo netInfo = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
                     NetworkInfo.State networkState = netInfo == null
-                        ? NetworkInfo.State.DISCONNECTED
-                        : netInfo.getState();
+                            ? NetworkInfo.State.DISCONNECTED
+                            : netInfo.getState();
 
                     switch (networkState) {
                         case CONNECTED:
-                            final WifiInfo wifiInfo = intent.getParcelableExtra(WifiManager.EXTRA_WIFI_INFO);
+                            final WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
                             final String wifiSSID = wifiInfo.getSSID();
                             Timber.i("Connected to " + wifiSSID);
 
@@ -159,12 +166,12 @@ public class WifiConnectionHandler {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             netReq = new NetworkRequest.Builder()
-                .addCapability(NetworkCapabilities.NET_CAPABILITY_TRUSTED)
-                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-                .addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)
-                .addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_VPN)
-                .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
-                .build();
+                    .addCapability(NetworkCapabilities.NET_CAPABILITY_TRUSTED)
+                    .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                    .addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)
+                    .addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_VPN)
+                    .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+                    .build();
 
             netReqCb = new ConnectivityManager.NetworkCallback() {
 
@@ -282,8 +289,8 @@ public class WifiConnectionHandler {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Network network = info == null
-                ? null
-                : (Network) info.getParcelable(MavLinkConnection.EXTRA_NETWORK);
+                    ? null
+                    : (Network) info.getParcelable(MavLinkConnection.EXTRA_NETWORK);
             if (network == null) {
                 return false;
             }
@@ -371,7 +378,15 @@ public class WifiConnectionHandler {
         return LinkConnectionStatus.UNKNOWN;
     }
 
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 123;
+
     private WifiConfiguration getWifiConfigs(String networkSSID) {
+
+        if (ActivityCompat.checkSelfPermission(this.context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions((Activity) this.context, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
+            return null;
+        }
+
         List<WifiConfiguration> networks = wifiMgr.getConfiguredNetworks();
         if (networks == null) {
             return null;
@@ -471,7 +486,7 @@ public class WifiConnectionHandler {
     private void notifyWifiConnectionFailed() {
         if (listener != null) {
             LinkConnectionStatus linkConnectionStatus = LinkConnectionStatus
-                .newFailedConnectionStatus(LinkConnectionStatus.INVALID_CREDENTIALS, null);
+                    .newFailedConnectionStatus(LinkConnectionStatus.INVALID_CREDENTIALS, null);
             listener.onWifiConnectionFailed(linkConnectionStatus);
         }
     }

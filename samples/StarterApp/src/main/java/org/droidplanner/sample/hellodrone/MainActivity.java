@@ -1,14 +1,20 @@
 package org.droidplanner.sample.hellodrone;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.SurfaceTexture;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+
 import android.util.Log;
 import android.view.Surface;
 import android.view.TextureView;
@@ -297,10 +303,9 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
 
     private void checkSoloState() {
         final SoloState soloState = drone.getAttribute(SoloAttributes.SOLO_STATE);
-        if (soloState == null){
+        if (soloState == null) {
             alertUser("Unable to retrieve the solo state.");
-        }
-        else {
+        } else {
             alertUser("Solo state is up to date.");
         }
     }
@@ -310,27 +315,29 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
 
     }
 
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 123;
+
     // UI Events
     // ==========================================================
 
     public void onBtnConnectTap(View view) {
-        if (devicesList.size()>0) {
-            Spinner spinner = (Spinner)findViewById(R.id.selectDevice);
+        if (devicesList.size() > 0) {
+            Spinner spinner = (Spinner) findViewById(R.id.selectDevice);
             String text = spinner.getSelectedItem().toString();
 
 
             UsbCDCConnection.productId = 0;
             UsbCDCConnection.vendorId = 0;
 
-            for (int i=0;i<devicesList.size();i++){
-                if (devicesList.get(i).mProductName.equals(text)){
+            for (int i = 0; i < devicesList.size(); i++) {
+                if (devicesList.get(i).mProductName.equals(text)) {
                     UsbCDCConnection.productId = Integer.parseInt(devicesList.get(i).mProductId);
                     UsbCDCConnection.vendorId = Integer.parseInt(devicesList.get(i).mVendorId);
                 }
             }
 
-            System.out.println("productId: "+UsbCDCConnection.productId);
-            System.out.println("vendorId: "+UsbCDCConnection.vendorId);
+            System.out.println("productId: " + UsbCDCConnection.productId);
+            System.out.println("vendorId: " + UsbCDCConnection.vendorId);
 
             if (this.drone.isConnected()) {
                 this.drone.disconnect();
@@ -343,6 +350,25 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
                         : ConnectionParameter.newUdpConnection(null);
 
                 this.drone.connect(connectionParams);
+            }
+        } else {
+            if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
+
+            }
+            else {
+                if (this.drone.isConnected()) {
+                    this.drone.disconnect();
+                } else {
+                    Spinner connectionSelector = (Spinner) findViewById(R.id.selectConnectionType);
+                    int selectedConnectionType = connectionSelector.getSelectedItemPosition();
+
+                    ConnectionParameter connectionParams = selectedConnectionType == ConnectionType.TYPE_USB
+                            ? ConnectionParameter.newUsbConnection(null)
+                            : ConnectionParameter.newUdpConnection(DEFAULT_UDP_PORT, null);
+
+                    this.drone.connect(connectionParams);
+                }
             }
         }
     }
@@ -377,6 +403,7 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
         }
 
     }
+
     static class ListItem {
         UsbDevice device;
         int port;
@@ -388,13 +415,15 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
             this.driver = driver;
         }
     }
+
     private final ArrayList<ListItem> listItems = new ArrayList<>();
 
-    private class DeviceHolder{
+    private class DeviceHolder {
         public String mProductName;
         public String mVendorId;
         public String mProductId;
-        DeviceHolder(String _mProductName,String _mVendorId,String _mProductId){
+
+        DeviceHolder(String _mProductName, String _mVendorId, String _mProductId) {
             this.mProductName = _mProductName;
             this.mVendorId = _mVendorId;
             this.mProductId = _mProductId;
@@ -407,46 +436,45 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
         refresh();
     }
 
-    public void refresh(){
+    public void refresh() {
         System.out.println("REFRESH");
         UsbManager usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);//(UsbManager) getActivity().getSystemService(Context.USB_SERVICE);
         UsbSerialProber usbDefaultProber = UsbSerialProber.getDefaultProber();
         UsbSerialProber usbCustomProber = CustomProber.getCustomProber();
         listItems.clear();
-        for(UsbDevice device : usbManager.getDeviceList().values()) {
+        for (UsbDevice device : usbManager.getDeviceList().values()) {
             UsbSerialDriver driver = usbDefaultProber.probeDevice(device);
-            if(driver == null) {
+            if (driver == null) {
                 driver = usbCustomProber.probeDevice(device);
             }
-            if(driver != null) {
-                for(int port = 0; port < driver.getPorts().size(); port++)
+            if (driver != null) {
+                for (int port = 0; port < driver.getPorts().size(); port++)
                     listItems.add(new ListItem(device, port, driver));
             } else {
                 listItems.add(new ListItem(device, 0, null));
             }
         }
         devicesList.clear();
-        for (ListItem item: listItems
+        for (ListItem item : listItems
         ) {
             String vendorRegex = "mVendorId=([^,]+),";
             String productIdRegex = "mProductId=([^,]+),";
             String productNameRegex = "mProductName=([^,]+),";
-            String [] patterns  = new String [] {productNameRegex, vendorRegex, productIdRegex};
-            String [] results = new String[3];
+            String[] patterns = new String[]{productNameRegex, vendorRegex, productIdRegex};
+            String[] results = new String[3];
             boolean allWasFound = true;
-            for (int i=0;i<3;i++){
+            for (int i = 0; i < 3; i++) {
                 Pattern r = Pattern.compile(patterns[i]);
                 Matcher m = r.matcher(item.device.toString());
-                if (m.find()){
+                if (m.find()) {
                     results[i] = m.group(1);
-                }
-                else{
+                } else {
                     allWasFound = false;
                 }
             }
             if (allWasFound) {
                 System.out.println("###################");
-                for (int i=0;i<3;i++) {
+                for (int i = 0; i < 3; i++) {
                     System.out.println(results[i]);
                 }
 
@@ -455,7 +483,7 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
         }
         Spinner dropdown = findViewById(R.id.selectDevice);
         String[] items = new String[devicesList.size()];
-        for (int i=0;i<devicesList.size();i++){
+        for (int i = 0; i < devicesList.size(); i++) {
             items[i] = devicesList.get(i).mProductName;
         }
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, items);
@@ -751,7 +779,7 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
                     public void onDecodingEnded() {
                         try {
                             mediaCodecManager.startDecoding(new Surface(videoView.getSurfaceTexture()),
-                                decoderListener);
+                                    decoderListener);
                         } catch (IOException | IllegalStateException e) {
                             Log.e(TAG, "Unable to create media codec.", e);
                             if (decoderListener != null)
@@ -845,7 +873,7 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
 
     @Override
     public void onLinkStateUpdated(@NonNull LinkConnectionStatus connectionStatus) {
-        switch(connectionStatus.getStatusCode()){
+        switch (connectionStatus.getStatusCode()) {
             case LinkConnectionStatus.FAILED:
                 Bundle extras = connectionStatus.getExtras();
                 String msg = null;
