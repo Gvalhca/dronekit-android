@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -29,9 +30,11 @@ public abstract class UdpConnection extends MavLinkConnection {
     }
 
     private void getUdpStream(Bundle extras) throws IOException {
-        final DatagramSocket socket = new DatagramSocket(serverPort);
+        final DatagramSocket socket = new DatagramSocket(null);
         socket.setBroadcast(true);
         socket.setReuseAddress(true);
+        String espAdd = "0.0.0.0";
+        socket.bind(new InetSocketAddress(espAdd, serverPort));
         NetworkUtils.bindSocketToNetwork(extras, socket);
         socketRef.set(socket);
     }
