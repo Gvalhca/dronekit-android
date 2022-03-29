@@ -8,6 +8,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -88,6 +89,7 @@ public abstract class UdpConnection extends MavLinkConnection {
                     sendPacket.setPort(hostPort);
                 }
                 socket.send(sendPacket);
+                System.out.println("Sent packet: " + Arrays.toString(sendPacket.getData()));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -120,6 +122,7 @@ public abstract class UdpConnection extends MavLinkConnection {
         socket.receive(receivePacket);
         hostAdd = receivePacket.getAddress();
         hostPort = receivePacket.getPort();
+        System.out.println("Received packet: " + Arrays.toString(receivePacket.getData()));
 //        if (!socket.isConnected()) {
 //            socket.connect(hostAdd, hostPort);
 //        }
