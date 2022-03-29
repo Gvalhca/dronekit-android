@@ -363,10 +363,12 @@ public class MainActivity extends AppCompatActivity implements DroneListener, To
                     Spinner connectionSelector = (Spinner) findViewById(R.id.selectConnectionType);
                     int selectedConnectionType = connectionSelector.getSelectedItemPosition();
 
+                    Bundle extraParams = new Bundle();
+                    extraParams.putInt(ConnectionType.EXTRA_UDP_SERVER_PORT, 14550); // Set default port to 14550
+
                     ConnectionParameter connectionParams = selectedConnectionType == ConnectionType.TYPE_USB
                             ? ConnectionParameter.newUsbConnection(null)
                             : ConnectionParameter.newUdpConnection(null);
-
                     this.drone.connect(connectionParams);
                 }
             }
