@@ -31,7 +31,8 @@ public abstract class UdpConnection extends MavLinkConnection {
 
     private void getUdpStream(Bundle extras) throws IOException {
         final DatagramSocket socketReceive = new DatagramSocket(serverPort);
-//        socketReceive.setBroadcast(true);
+//        final DatagramSocket socketReceive = new DatagramSocket(serverPort, InetAddress.getByName(espAdd));
+        socketReceive.setBroadcast(true);
         socketReceive.setReuseAddress(true);
 //        socketReceive.connect(socketAdd);
 //        NetworkUtils.bindSocketToNetwork(extras, socketReceive);
