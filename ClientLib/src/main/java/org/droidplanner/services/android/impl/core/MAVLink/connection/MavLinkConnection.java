@@ -3,6 +3,7 @@ package org.droidplanner.services.android.impl.core.MAVLink.connection;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+
 import androidx.core.util.Pair;
 
 import com.MAVLink.MAVLinkPacket;
@@ -59,7 +60,7 @@ public abstract class MavLinkConnection {
      * Stores the list of log files to be written to.
      */
     private final ConcurrentHashMap<String, Pair<Uri, BufferedOutputStream>> loggingOutStreams = new
-        ConcurrentHashMap<>();
+            ConcurrentHashMap<>();
 
     /**
      * Queue the set of packets to send via the mavlink connection. A thread
@@ -172,6 +173,11 @@ public abstract class MavLinkConnection {
             }
 
             for (int i = 0; i < bufferSize; i++) {
+//                if (i == 0) {
+//                    System.out.println(buffer[i]);
+//                    System.out.println(buffer[i] & 0x00ff);
+//                    System.out.println(buffer[i] & 0xff);
+//                }
                 MAVLinkPacket receivedPacket = parser.mavlink_parse_char(buffer[i] & 0x00ff);
                 if (receivedPacket != null) {
                     queueToLog(receivedPacket);
@@ -226,7 +232,7 @@ public abstract class MavLinkConnection {
                     logBuffer.putLong(System.currentTimeMillis() * 1000);
 
                     for (Map.Entry<String, Pair<Uri, BufferedOutputStream>> entry : loggingOutStreams
-                        .entrySet()) {
+                            .entrySet()) {
                         final Pair<Uri, BufferedOutputStream> logInfo = entry.getValue();
                         final Uri loggingFileUri = logInfo.first;
                         try {
@@ -271,7 +277,7 @@ public abstract class MavLinkConnection {
     private Thread mConnectThread;
     private Thread mTaskThread;
 
-    protected MavLinkConnection(Context context){
+    protected MavLinkConnection(Context context) {
         this.context = context;
     }
 
