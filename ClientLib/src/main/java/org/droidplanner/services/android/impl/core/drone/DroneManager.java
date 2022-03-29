@@ -104,10 +104,11 @@ public class DroneManager<T extends Drone, D> implements DataLink.DataLinkListen
     protected boolean isCompanionComputerEnabled() {
         final int connectionType = connectionParameter.getConnectionType();
 
-        return drone instanceof ArduSolo
-            || (connectionType == ConnectionType.TYPE_UDP && SoloComp.isAvailable(context))
-            || connectionType == ConnectionType.TYPE_SOLO;
-
+//        return drone instanceof ArduSolo
+//            || (connectionType == ConnectionType.TYPE_UDP && SoloComp.isAvailable(context))
+//            || connectionType == ConnectionType.TYPE_SOLO;
+        // Disable solo search due to errors and solo drones deprecation
+        return false;
     }
 
     public int getConnectedAppsCount() {

@@ -24,9 +24,12 @@ public class HeartBeat extends DroneVariable implements OnDroneListener<MavLinkD
     protected static final int NORMAL_HEARTBEAT = 2;
 
     protected int heartbeatState = FIRST_HEARTBEAT;
-    // If not working mb u need sysid = 255
+    // If not working you might need sysid = 255
+    private short alternativeSysId = 255;
+
     private short sysid = 1;
     private short compid = 1;
+
 
     /**
      * Stores the version of the mavlink protocol.
@@ -51,6 +54,10 @@ public class HeartBeat extends DroneVariable implements OnDroneListener<MavLinkD
         return sysid;
     }
 
+    public short getAlternativeSysId() {
+        return alternativeSysId;
+    }
+
     public short getCompid() {
         return compid;
     }
@@ -64,15 +71,15 @@ public class HeartBeat extends DroneVariable implements OnDroneListener<MavLinkD
 
     public void onHeartbeat(MAVLinkMessage msg) {
         msg_heartbeat heartBeatMsg = msg instanceof msg_heartbeat ? (msg_heartbeat) msg : null;
-        if(heartBeatMsg != null){
-            sysid  = validateToUnsignedByteRange(msg.sysid);
+        if (heartBeatMsg != null) {
+            sysid = validateToUnsignedByteRange(msg.sysid);
             compid = validateToUnsignedByteRange(msg.compid);
             mMavlinkVersion = heartBeatMsg.mavlink_version;
         }
 
         switch (heartbeatState) {
             case FIRST_HEARTBEAT:
-                if(heartBeatMsg != null) {
+                if (heartBeatMsg != null) {
                     Timber.i("Received first heartbeat.");
 
                     heartbeatState = NORMAL_HEARTBEAT;
@@ -84,7 +91,7 @@ public class HeartBeat extends DroneVariable implements OnDroneListener<MavLinkD
 
             case LOST_HEARTBEAT:
                 myDrone.notifyDroneEvent(DroneEventsType.HEARTBEAT_RESTORED);
-            // FALL THROUGH
+                // FALL THROUGH
 
             default:
                 heartbeatState = NORMAL_HEARTBEAT;

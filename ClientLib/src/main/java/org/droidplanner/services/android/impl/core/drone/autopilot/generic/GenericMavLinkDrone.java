@@ -242,6 +242,10 @@ public class GenericMavLinkDrone implements MavLinkDrone {
         return heartbeat.getSysid();
     }
 
+    public short getAlternativeSysId() {
+        return heartbeat.getAlternativeSysId();
+    }
+
     @Override
     public short getCompid() {
         return heartbeat.getCompid();
@@ -575,7 +579,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
     @Override
     public void onMavLinkMessageReceived(MAVLinkMessage message) {
 
-        if (message.sysid != this.getSysid()) {
+        if (message.sysid != this.getSysid() && message.sysid != this.getAlternativeSysId()) {
             // Reject Messages that are not for the system id
             return;
         }
