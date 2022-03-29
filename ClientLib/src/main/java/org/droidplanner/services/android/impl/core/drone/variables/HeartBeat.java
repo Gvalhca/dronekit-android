@@ -24,8 +24,9 @@ public class HeartBeat extends DroneVariable implements OnDroneListener<MavLinkD
     protected static final int NORMAL_HEARTBEAT = 2;
 
     protected int heartbeatState = FIRST_HEARTBEAT;
-    private short sysid = 255;
-    private short compid = 190;
+    // If not working mb u need sysid = 255
+    private short sysid = 1;
+    private short compid = 1;
 
     /**
      * Stores the version of the mavlink protocol.

@@ -173,11 +173,11 @@ public abstract class MavLinkConnection {
             }
 
             for (int i = 0; i < bufferSize; i++) {
-//                if (i == 0) {
-//                    System.out.println(buffer[i]);
-//                    System.out.println(buffer[i] & 0x00ff);
-//                    System.out.println(buffer[i] & 0xff);
-//                }
+                if (i == 0) {
+                    System.out.println(buffer[i]);
+                    System.out.println(buffer[i] & 0x00ff);
+                    System.out.println(buffer[i] & 0xff);
+                }
                 MAVLinkPacket receivedPacket = parser.mavlink_parse_char(buffer[i] & 0x00ff);
                 if (receivedPacket != null) {
                     queueToLog(receivedPacket);

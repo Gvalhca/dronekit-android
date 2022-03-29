@@ -123,7 +123,7 @@ public abstract class UdpConnection extends MavLinkConnection {
         hostAdd = receivePacket.getAddress();
         hostPort = receivePacket.getPort();
 
-//        System.out.println("Received packet: " + bytesToHex(receivePacket.getData()));
+        System.out.println("Received packet: " + bytesToHex(receivePacket.getData()));
 //        if (!socket.isConnected()) {
 //            socket.connect(hostAdd, hostPort);
 //        }
