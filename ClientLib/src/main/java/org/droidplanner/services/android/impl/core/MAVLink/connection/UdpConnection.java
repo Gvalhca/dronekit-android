@@ -7,9 +7,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -18,9 +16,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public abstract class UdpConnection extends MavLinkConnection {
 
     private final AtomicReference<DatagramSocket> socketRef = new AtomicReference<>();
-    private final AtomicReference<DatagramSocket> socketSendRef = new AtomicReference<>();
     private int serverPort;
-    final private String espAdd = "0.0.0.0";
     private int hostPort;
     private InetAddress hostAdd;
     private DatagramPacket sendPacket;
@@ -32,34 +28,17 @@ public abstract class UdpConnection extends MavLinkConnection {
 
     private void getUdpStream(Bundle extras) throws IOException {
         final DatagramSocket socketReceive = new DatagramSocket(serverPort);
-//        final DatagramSocket socketReceive = new DatagramSocket(serverPort, InetAddress.getByName(espAdd));
         socketReceive.setBroadcast(true);
         socketReceive.setReuseAddress(true);
-//        socketReceive.connect(socketAdd);
 //        NetworkUtils.bindSocketToNetwork(extras, socketReceive);
         socketRef.set(socketReceive);
-
-        System.out.println(socketReceive.getLocalPort());
-        System.out.println(socketReceive.getLocalAddress().getHostAddress());
-        System.out.println(socketReceive.getLocalSocketAddress());
-        System.out.println(socketReceive.getRemoteSocketAddress());
-        System.out.println(socketReceive.getSoTimeout());
-        System.out.println(socketReceive.isConnected());
-
-        final DatagramSocket socketSend = new DatagramSocket(null);
-        socketSend.setBroadcast(true);
-        socketSend.setReuseAddress(true);
-
-        socketSendRef.set(socketSend);
     }
 
     @Override
     public final void closeConnection() throws IOException {
         final DatagramSocket socketReceive = socketRef.get();
-        final DatagramSocket socketSend = socketSendRef.get();
         if (socketReceive != null) {
             socketReceive.close();
-            socketSend.close();
         }
     }
 
@@ -75,21 +54,18 @@ public abstract class UdpConnection extends MavLinkConnection {
         if (socket == null) {
             return;
         }
-        InetAddress socketAdd = InetAddress.getByName(espAdd);
-
         try {
             if (hostAdd != null) { // We can't send to our sister until they
                 // have connected to us
                 if (sendPacket == null) {
                     sendPacket = new DatagramPacket(buffer, buffer.length, hostAdd, hostPort);
                 } else {
-//                    sendPacket = new DatagramPacket(buffer, 0, buffer.length, hostAdd, hostPort);
                     sendPacket.setData(buffer, 0, buffer.length);
                     sendPacket.setAddress(hostAdd);
                     sendPacket.setPort(hostPort);
                 }
                 socket.send(sendPacket);
-                System.out.println("Sent packet: " + Arrays.toString(sendPacket.getData()) + bytesToHex(sendPacket.getData()));
+//                System.out.println("Sent packet: " + Arrays.toString(sendPacket.getData()) + bytesToHex(sendPacket.getData()));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -97,7 +73,7 @@ public abstract class UdpConnection extends MavLinkConnection {
     }
 
     public void sendBuffer(InetAddress targetAddr, int targetPort, byte[] buffer) throws IOException {
-        final DatagramSocket socket = socketSendRef.get();
+        final DatagramSocket socket = socketRef.get();
         if (socket == null || targetAddr == null || buffer == null) {
             return;
         }
@@ -123,14 +99,12 @@ public abstract class UdpConnection extends MavLinkConnection {
         hostAdd = receivePacket.getAddress();
         hostPort = receivePacket.getPort();
 
-        System.out.println("Received packet: " + bytesToHex(receivePacket.getData()));
-//        if (!socket.isConnected()) {
-//            socket.connect(hostAdd, hostPort);
-//        }
+//        System.out.println("Received packet: " + bytesToHex(receivePacket.getData()));
         return receivePacket.getLength();
     }
 
     private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
+
     public static String bytesToHex(byte[] bytes) {
         char[] hexChars = new char[bytes.length * 2];
         for (int j = 0; j < bytes.length; j++) {
