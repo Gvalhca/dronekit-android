@@ -89,7 +89,7 @@ public abstract class UdpConnection extends MavLinkConnection {
                     sendPacket.setPort(hostPort);
                 }
                 socket.send(sendPacket);
-                System.out.println("Sent packet: " + bytesToHex(sendPacket.getData()));
+                System.out.println("Sent packet: " + Arrays.toString(sendPacket.getData()) + bytesToHex(sendPacket.getData()));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -123,7 +123,7 @@ public abstract class UdpConnection extends MavLinkConnection {
         hostAdd = receivePacket.getAddress();
         hostPort = receivePacket.getPort();
 
-        System.out.println("Received packet: " + bytesToHex(receivePacket.getData()));
+//        System.out.println("Received packet: " + bytesToHex(receivePacket.getData()));
 //        if (!socket.isConnected()) {
 //            socket.connect(hostAdd, hostPort);
 //        }
