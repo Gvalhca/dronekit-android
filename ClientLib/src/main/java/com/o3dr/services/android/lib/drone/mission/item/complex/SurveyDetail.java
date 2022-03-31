@@ -14,6 +14,24 @@ public class SurveyDetail implements Parcelable {
     private double sidelap;
     private boolean lockOrientation;
     private CameraDetail cameraDetail;
+    private double flightCorridorWidth;
+    private double wpInterval;
+
+    public double getFlightCorridorWidth() {
+        return flightCorridorWidth;
+    }
+
+    public void setFlightCorridorWidth(double flightCorridorWidth) {
+        this.flightCorridorWidth = flightCorridorWidth;
+    }
+
+    public double getWpInterval() {
+        return wpInterval;
+    }
+
+    public void setWpInterval(double wpInterval) {
+        this.wpInterval = wpInterval;
+    }
 
     public double getAltitude() {
         return altitude;
@@ -57,18 +75,20 @@ public class SurveyDetail implements Parcelable {
 
     /**
      * True if aircraft's yaw is locked to the angle of the survey
+     *
      * @since 3.0.0
      */
-    public boolean getLockOrientation(){
+    public boolean getLockOrientation() {
         return lockOrientation;
     }
 
     /**
      * Lock aircraft's yaw to the angle of the survey
+     *
      * @param lockOrientation
      * @since 3.0.0
      */
-    public void setLockOrientation(boolean lockOrientation){
+    public void setLockOrientation(boolean lockOrientation) {
         this.lockOrientation = lockOrientation;
     }
 
@@ -85,8 +105,8 @@ public class SurveyDetail implements Parcelable {
 
     public double getGroundResolution() {
         return ((altitude * cameraDetail.getSensorLateralSize() / cameraDetail.getFocalLength()
-                        * (altitude * cameraDetail.getSensorLongitudinalSize()
-                /  cameraDetail.getFocalLength()) / (cameraDetail.getSensorResolution() * 1000)))
+                * (altitude * cameraDetail.getSensorLongitudinalSize()
+                / cameraDetail.getFocalLength()) / (cameraDetail.getSensorResolution() * 1000)))
                 / 10000;
     }
 
@@ -110,19 +130,23 @@ public class SurveyDetail implements Parcelable {
         dest.writeDouble(this.overlap);
         dest.writeDouble(this.sidelap);
         dest.writeParcelable(this.cameraDetail, 0);
-        dest.writeByte((byte)(this.lockOrientation?1:0));
+        dest.writeByte((byte) (this.lockOrientation ? 1 : 0));
+        dest.writeDouble(this.flightCorridorWidth);
+        dest.writeDouble(this.wpInterval);
     }
 
     public SurveyDetail() {
     }
 
-    public SurveyDetail(SurveyDetail copy){
+    public SurveyDetail(SurveyDetail copy) {
         this.altitude = copy.altitude;
         this.angle = copy.angle;
         this.overlap = copy.overlap;
         this.sidelap = copy.sidelap;
         this.lockOrientation = copy.lockOrientation;
         this.cameraDetail = copy.cameraDetail == null ? null : new CameraDetail(copy.cameraDetail);
+        this.flightCorridorWidth = copy.flightCorridorWidth;
+        this.wpInterval = copy.wpInterval;
     }
 
     private SurveyDetail(Parcel in) {
@@ -132,6 +156,8 @@ public class SurveyDetail implements Parcelable {
         this.sidelap = in.readDouble();
         this.cameraDetail = in.readParcelable(CameraDetail.class.getClassLoader());
         this.lockOrientation = in.readByte() != 0;
+        this.flightCorridorWidth = in.readDouble();
+        this.wpInterval = in.readDouble();
     }
 
     public static final Parcelable.Creator<SurveyDetail> CREATOR = new Parcelable.Creator<SurveyDetail>() {

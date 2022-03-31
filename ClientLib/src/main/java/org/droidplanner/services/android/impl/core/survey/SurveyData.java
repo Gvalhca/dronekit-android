@@ -1,5 +1,7 @@
 package org.droidplanner.services.android.impl.core.survey;
 
+import com.o3dr.services.android.lib.drone.mission.item.complex.Survey;
+
 import org.droidplanner.services.android.impl.core.helpers.units.Area;
 
 import java.util.Locale;
@@ -12,17 +14,25 @@ public class SurveyData {
     private Double sidelap;
     private boolean lockOrientation;
     private Footprint footprint;
+    private Double flightCorridorWidth;
+    private Double wpInterval;
 
     public SurveyData() {
         update(0, (50.0), 50, 60, false);
     }
 
     public void update(double angle, double altitude, double overlap, double sidelap, boolean lockOrientation) {
+        this.update(angle, altitude, overlap, sidelap, lockOrientation, Survey.DEFAULT_CORRIDOR_WIDTH, Survey.DEFAULT_WP_INTERVAL);
+    }
+
+    public void update(double angle, double altitude, double overlap, double sidelap, boolean lockOrientation, double flightCorridorWidth, double wpInterval) {
         this.angle = angle;
         this.overlap = overlap;
         this.sidelap = sidelap;
         setAltitude(altitude);
         this.lockOrientation = lockOrientation;
+        this.flightCorridorWidth = flightCorridorWidth;
+        this.wpInterval = wpInterval;
     }
 
     public void setAltitude(double altitude) {
@@ -61,6 +71,14 @@ public class SurveyData {
         return getLateralFootPrint() * (1 - sidelap * .01);
     }
 
+    public double getFlightCorridorWidth() {
+        return flightCorridorWidth;
+    }
+
+    public double getWpInterval() {
+        return wpInterval;
+    }
+
     public double getAltitude() {
         return altitude;
     }
@@ -93,7 +111,7 @@ public class SurveyData {
         return camera.name;
     }
 
-    public boolean getLockOrientation(){
+    public boolean getLockOrientation() {
         return lockOrientation;
     }
 

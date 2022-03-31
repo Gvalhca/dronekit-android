@@ -7,12 +7,17 @@ import com.o3dr.services.android.lib.drone.mission.item.MissionItem;
 import com.o3dr.services.android.lib.drone.mission.MissionItemType;
 import com.o3dr.services.android.lib.util.MathUtils;
 
+import org.droidplanner.services.android.impl.core.survey.SurveyData;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  */
 public class Survey extends MissionItem implements MissionItem.ComplexItem<Survey>, android.os.Parcelable {
+
+    public static final double DEFAULT_CORRIDOR_WIDTH = 300;
+    public static final double DEFAULT_WP_INTERVAL = 100;
 
     private SurveyDetail surveyDetail = new SurveyDetail();
     {
@@ -21,6 +26,8 @@ public class Survey extends MissionItem implements MissionItem.ComplexItem<Surve
         surveyDetail.setOverlap(50);
         surveyDetail.setSidelap(60);
         surveyDetail.setLockOrientation(false);
+        surveyDetail.setFlightCorridorWidth(DEFAULT_CORRIDOR_WIDTH);
+        surveyDetail.setWpInterval(DEFAULT_WP_INTERVAL);
     }
 
     private double polygonArea;

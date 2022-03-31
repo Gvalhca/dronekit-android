@@ -54,9 +54,9 @@ public class EndpointSorter {
 	}
 
 	private void updateCameraLocations(LatLong firstWP, LatLong secondWp) {
-		List<LatLong> cameraLocationsOnThisStrip = new LineSampler(firstWP, secondWp)
+		List<LatLong> cameraLocationsOnThisCorridor = new LineSampler(firstWP, secondWp)
 				.sample(sampleDistance);
-		cameraLocations.addAll(cameraLocationsOnThisStrip);
+		cameraLocations.addAll(cameraLocationsOnThisCorridor);
 	}
 
 	public List<LatLong> getSortedGrid() {

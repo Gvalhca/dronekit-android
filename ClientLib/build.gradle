@@ -41,7 +41,7 @@ android {
         versionName = PUBLISH_VERSION
 
         buildConfigField("int", "VERSION_CODE", "${PUBLISH_VERSION_CODE}")
-        buildConfigField("String","VERSION_NAME","\"${PUBLISH_VERSION}\"")
+        buildConfigField("String", "VERSION_NAME", "\"${PUBLISH_VERSION}\"")
 
         //Build config fields
         buildConfigField "boolean", "SITL_DEBUG", "false"
@@ -138,7 +138,7 @@ def getSoloLinkIp() {
 def getLocalIp() {
     try {
         return '\"' + InetAddress.getLocalHost().getCanonicalHostName() + '\"'
-    }catch(Exception e){
+    } catch (Exception e) {
         return '\"\"'
     }
 }
@@ -147,3 +147,17 @@ evaluationDependsOn ':Mavlink'
 assemble.dependsOn ':Mavlink:jar'
 
 apply from: "$projectDir/maven-push.gradle"
+task copyAarToTowerLibs(type: Copy) {
+    from([buildDir.absolutePath, 'outputs', 'aar'].join(File.separator))
+    include("*.aar")
+    into([rootDir.absolutePath, '..', 'Tower-dronekit-v3.0.2', 'Tower', 'Android', 'libs'].join(File.separator))
+}
+
+task copyJarToTowerLibs(type: Copy) {
+    from([buildDir.absolutePath, '..', 'libs'].join(File.separator))
+    include("Mavlink.jar")
+    into([rootDir.absolutePath, '..', 'Tower-dronekit-v3.0.2', 'Tower', 'Android', 'libs'].join(File.separator))
+}
+
+assemble.finalizedBy(copyAarToTowerLibs, copyJarToTowerLibs)
+
