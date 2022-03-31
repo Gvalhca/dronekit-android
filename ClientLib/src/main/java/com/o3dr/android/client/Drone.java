@@ -79,6 +79,7 @@ public class Drone {
     public static final int COLLISION_SECONDS_BEFORE_COLLISION = 2;
     public static final double COLLISION_DANGEROUS_SPEED_METERS_PER_SECOND = -3.0;
     public static final double COLLISION_SAFE_ALTITUDE_METERS = 1.0;
+    public static boolean lookAtMode = true;
 
     public static final String ACTION_GROUND_COLLISION_IMMINENT = CLAZZ_NAME + ".ACTION_GROUND_COLLISION_IMMINENT";
     public static final String EXTRA_IS_GROUND_COLLISION_IMMINENT = "extra_is_ground_collision_imminent";
@@ -105,6 +106,7 @@ public class Drone {
     // ----------------
     private long startTime = 0;
     private long elapsedFlightTime = 0;
+
 
     private final Context context;
     private final ClassLoader contextClassLoader;
