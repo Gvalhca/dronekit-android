@@ -74,7 +74,7 @@ public class SurveyImpl extends MissionItemImpl {
         CameraTriggerImpl camTrigger = new CameraTriggerImpl(missionImpl, surveyData.getLongitudinalPictureDistance());
 
         //Add it if the user wants it to start before the first waypoint.
-        if(startCameraBeforeFirstWaypoint){
+        if (startCameraBeforeFirstWaypoint) {
             list.addAll(camTrigger.packMissionItem());
         }
 
@@ -83,15 +83,15 @@ public class SurveyImpl extends MissionItemImpl {
         //Add the camera trigger after the first waypoint if it wasn't added before.
         boolean addToFirst = !startCameraBeforeFirstWaypoint;
 
-        for (LatLong point : grid.gridPoints) {
+        for (LatLong point : grid.getCameraLocations()) {
             msg_mission_item mavMsg = getSurveyPoint(point, altitude);
             list.add(mavMsg);
-            if(surveyData.getLockOrientation()) {
+            if (surveyData.getLockOrientation()) {
                 msg_mission_item yawMsg = getYawCondition(surveyData.getAngle());
                 list.add(yawMsg);
             }
 
-            if(addToFirst){
+            if (addToFirst) {
                 list.addAll(camTrigger.packMissionItem());
                 addToFirst = false;
             }
@@ -100,7 +100,7 @@ public class SurveyImpl extends MissionItemImpl {
         list.addAll((new CameraTriggerImpl(missionImpl, (0.0)).packMissionItem()));
     }
 
-    protected msg_mission_item getSurveyPoint(LatLong point, double altitude){
+    protected msg_mission_item getSurveyPoint(LatLong point, double altitude) {
         return packSurveyPoint(point, altitude);
     }
 
@@ -119,7 +119,7 @@ public class SurveyImpl extends MissionItemImpl {
         return mavMsg;
     }
 
-    private msg_mission_item getYawCondition(double angle){
+    private msg_mission_item getYawCondition(double angle) {
         msg_mission_item mavMsg = new msg_mission_item();
         mavMsg.autocontinue = 1;
         mavMsg.frame = MAV_FRAME.MAV_FRAME_LOCAL_ENU;
@@ -127,7 +127,7 @@ public class SurveyImpl extends MissionItemImpl {
         mavMsg.x = 0f;
         mavMsg.y = 0f;
         mavMsg.z = 0f;
-        mavMsg.param1 = (float)angle;
+        mavMsg.param1 = (float) angle;
         //yaw craft a 30 degrees per second (value is relatively insignificant since it only applies when approaching first waypoint of mission)
         mavMsg.param2 = 30;
         mavMsg.param3 = 0;
