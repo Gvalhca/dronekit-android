@@ -83,7 +83,7 @@ public class SurveyImpl extends MissionItemImpl {
         //Add the camera trigger after the first waypoint if it wasn't added before.
         boolean addToFirst = !startCameraBeforeFirstWaypoint;
 
-        for (LatLong point : grid.getCameraLocations()) {
+        for (LatLong point : grid.gridPoints) {
             msg_mission_item mavMsg = getSurveyPoint(point, altitude);
             list.add(mavMsg);
             if (surveyData.getLockOrientation()) {
