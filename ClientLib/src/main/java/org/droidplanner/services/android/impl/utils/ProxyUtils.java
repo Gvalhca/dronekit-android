@@ -142,7 +142,7 @@ public class ProxyUtils {
                 Takeoff proxy = (Takeoff) proxyItem;
 
                 TakeoffImpl temp = new TakeoffImpl(missionImpl, proxy.getTakeoffAltitude(),
-                    proxy.getTakeoffPitch());
+                        proxy.getTakeoffPitch());
 
                 missionItemImpl = temp;
                 break;
@@ -245,6 +245,8 @@ public class ProxyUtils {
                             surveyDetail.getOverlap(), surveyDetail.getSidelap(), surveyDetail.getLockOrientation());
                 }
 
+                temp.polygonId = proxy.getPolygonId();
+
                 try {
                     temp.build();
                 } catch (Exception e) {
@@ -269,6 +271,9 @@ public class ProxyUtils {
                     temp.update(surveyDetail.getAngle(), (surveyDetail.getAltitude()),
                             surveyDetail.getOverlap(), surveyDetail.getSidelap(), surveyDetail.getLockOrientation());
                 }
+
+                temp.polygonId = proxy.getPolygonId();                temp.polygonId = proxy.getPolygonId();
+
 
                 try {
                     temp.build();
@@ -393,11 +398,10 @@ public class ProxyUtils {
             case ROI: {
                 RegionOfInterestImpl source = (RegionOfInterestImpl) itemImpl;
 
-                if(source.isReset()){
+                if (source.isReset()) {
                     ResetROI temp = new ResetROI();
                     proxyMissionItem = temp;
-                }
-                else {
+                } else {
                     RegionOfInterest temp = new RegionOfInterest();
                     temp.setCoordinate((source.getCoordinate()));
 
@@ -418,6 +422,7 @@ public class ProxyUtils {
 
                 Survey temp = new Survey();
                 temp.setStartCameraBeforeFirstWaypoint(source.isStartCameraBeforeFirstWaypoint());
+                temp.setPolygonId(source.polygonId);
                 temp.setValid(isValid);
                 temp.setSurveyDetail(getSurveyDetail(source.surveyData));
                 temp.setPolygonPoints((source.polygon.getPoints()));
@@ -448,6 +453,7 @@ public class ProxyUtils {
                 temp.setValid(isValid);
                 temp.setSurveyDetail(getSurveyDetail(source.surveyData));
                 temp.setPolygonPoints((source.polygon.getPoints()));
+                temp.setPolygonId(source.polygonId);
 
                 if (source.grid != null) {
                     temp.setGridPoints((source.grid.gridPoints));

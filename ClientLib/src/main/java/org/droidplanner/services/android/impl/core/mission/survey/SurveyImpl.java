@@ -23,6 +23,7 @@ public class SurveyImpl extends MissionItemImpl {
     public Polygon polygon = new Polygon();
     public SurveyData surveyData = new SurveyData();
     public Grid grid;
+    public Integer polygonId;
 
     private boolean startCameraBeforeFirstWaypoint;
 

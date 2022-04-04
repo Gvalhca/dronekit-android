@@ -11,6 +11,7 @@ import org.droidplanner.services.android.impl.core.survey.SurveyData;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  */
@@ -36,6 +37,7 @@ public class Survey extends MissionItem implements MissionItem.ComplexItem<Surve
     private List<LatLong> cameraLocations = new ArrayList<LatLong>();
     private boolean isValid;
     private boolean startCameraBeforeFirstWaypoint;
+    private int polygonId;
 
     public Survey(){
         this(MissionItemType.SURVEY);
@@ -58,6 +60,7 @@ public class Survey extends MissionItem implements MissionItem.ComplexItem<Surve
         this.cameraLocations = copyPointsList(source.cameraLocations);
         this.isValid = source.isValid;
         this.startCameraBeforeFirstWaypoint = source.startCameraBeforeFirstWaypoint;
+        this.polygonId = source.polygonId;
     }
 
     private List<LatLong> copyPointsList(List<LatLong> copy){
@@ -67,6 +70,14 @@ public class Survey extends MissionItem implements MissionItem.ComplexItem<Surve
         }
 
         return dest;
+    }
+
+    public int getPolygonId() {
+        return polygonId;
+    }
+
+    public void setPolygonId(int polygonId) {
+        this.polygonId = polygonId;
     }
 
     public SurveyDetail getSurveyDetail() {
@@ -156,13 +167,14 @@ public class Survey extends MissionItem implements MissionItem.ComplexItem<Surve
                 ", gridPoints=" + gridPoints +
                 ", isValid=" + isValid +
                 ", startCameraBeforeFirstWaypoint=" + startCameraBeforeFirstWaypoint +
+                ", polygonId=" + polygonId +
                 '}';
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Survey)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
 
         Survey survey = (Survey) o;
@@ -170,14 +182,14 @@ public class Survey extends MissionItem implements MissionItem.ComplexItem<Surve
         if (Double.compare(survey.polygonArea, polygonArea) != 0) return false;
         if (isValid != survey.isValid) return false;
         if (startCameraBeforeFirstWaypoint != survey.startCameraBeforeFirstWaypoint) return false;
+        if (polygonId != survey.polygonId) return false;
         if (surveyDetail != null ? !surveyDetail.equals(survey.surveyDetail) : survey.surveyDetail != null)
             return false;
         if (polygonPoints != null ? !polygonPoints.equals(survey.polygonPoints) : survey.polygonPoints != null)
             return false;
         if (gridPoints != null ? !gridPoints.equals(survey.gridPoints) : survey.gridPoints != null)
             return false;
-        return !(cameraLocations != null ? !cameraLocations.equals(survey.cameraLocations) : survey.cameraLocations != null);
-
+        return cameraLocations != null ? cameraLocations.equals(survey.cameraLocations) : survey.cameraLocations == null;
     }
 
     @Override
@@ -192,6 +204,7 @@ public class Survey extends MissionItem implements MissionItem.ComplexItem<Surve
         result = 31 * result + (cameraLocations != null ? cameraLocations.hashCode() : 0);
         result = 31 * result + (isValid ? 1 : 0);
         result = 31 * result + (startCameraBeforeFirstWaypoint ? 1 : 0);
+        result = 31 * result + polygonId;
         return result;
     }
 
@@ -205,6 +218,7 @@ public class Survey extends MissionItem implements MissionItem.ComplexItem<Surve
         dest.writeTypedList(cameraLocations);
         dest.writeByte(isValid ? (byte) 1 : (byte) 0);
         dest.writeByte(startCameraBeforeFirstWaypoint ? (byte) 1: (byte) 0);
+        dest.writeInt(polygonId);
     }
 
     protected Survey(Parcel in) {
@@ -216,6 +230,7 @@ public class Survey extends MissionItem implements MissionItem.ComplexItem<Surve
         in.readTypedList(cameraLocations, LatLong.CREATOR);
         this.isValid = in.readByte() != 0;
         this.startCameraBeforeFirstWaypoint = in.readByte() != 0;
+        this.polygonId = in.readInt();
     }
 
     @Override
