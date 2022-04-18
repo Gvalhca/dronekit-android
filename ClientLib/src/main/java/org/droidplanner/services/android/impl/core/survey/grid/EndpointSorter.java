@@ -43,7 +43,7 @@ public class EndpointSorter {
 
 		grid.remove(closestLine);
 
-		updateCameraLocations(firstWP, secondWp);
+//		updateCameraLocations(firstWP, secondWp);
 		gridPoints.add(firstWP);
 		gridPoints.add(secondWp);
 		
