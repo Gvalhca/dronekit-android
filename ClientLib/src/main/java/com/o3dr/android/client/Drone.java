@@ -77,6 +77,7 @@ public class Drone {
     }
 
     public enum LongPressState {NO_SELECTED, GOTO, LOOK_AT }
+    public static Boolean soundEnabled = false;
     public static LongPressState currentLongPressState = LongPressState.NO_SELECTED;
     public static final int COLLISION_SECONDS_BEFORE_COLLISION = 2;
     public static final double COLLISION_DANGEROUS_SPEED_METERS_PER_SECOND = -3.0;

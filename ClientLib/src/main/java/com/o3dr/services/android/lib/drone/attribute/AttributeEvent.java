@@ -213,4 +213,9 @@ public class AttributeEvent {
      */
     public static final String RETURN_TO_ME_STATE_UPDATE = PACKAGE_NAME + ".RETURN_TO_ME_STATE_UPDATE";
 
+
+    /**
+     * Signals an update sound servo state.
+     */
+    public static final String SOUND_SERVO_STATE_UPDATE = PACKAGE_NAME + ".SOUND_SERVO_STATE_UPDATE";
 }
