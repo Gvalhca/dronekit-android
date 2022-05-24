@@ -1,5 +1,6 @@
 package org.droidplanner.services.android.impl.core.mission.survey;
 
+import com.MAVLink.common.msg_command_long;
 import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.enums.MAV_CMD;
 import com.MAVLink.enums.MAV_FRAME;
@@ -76,13 +77,25 @@ public class SurveyImpl extends MissionItemImpl {
 
         //Add it if the user wants it to start before the first waypoint.
         if (startCameraBeforeFirstWaypoint) {
-            list.addAll(camTrigger.packMissionItem());
+            //list.addAll(camTrigger.packMissionItem());
         }
+
+        msg_mission_item start_sound = new msg_mission_item();
+        start_sound.command = MAV_CMD.MAV_CMD_DO_SET_SERVO;
+        start_sound.param1 = 6;
+        start_sound.param2 = 20000;
+//
+//        msg_mission_item stop_sound = list.get(0);
+//        stop_sound.command = MAV_CMD.MAV_CMD_DO_SET_SERVO;
+//        stop_sound.param1 = 6;
+//        stop_sound.param2 = 1000;
+//
+        // list.add(start_sound);
 
         final double altitude = surveyData.getAltitude();
 
         //Add the camera trigger after the first waypoint if it wasn't added before.
-        boolean addToFirst = !startCameraBeforeFirstWaypoint;
+        boolean addToFirst = true;//!startCameraBeforeFirstWaypoint;
 
         for (LatLong point : grid.gridPoints) {
             msg_mission_item mavMsg = getSurveyPoint(point, altitude);
@@ -93,12 +106,17 @@ public class SurveyImpl extends MissionItemImpl {
             }
 
             if (addToFirst) {
-                list.addAll(camTrigger.packMissionItem());
+                list.add(start_sound);
                 addToFirst = false;
             }
         }
+        msg_mission_item stop_sound = new msg_mission_item();
+        stop_sound.command = MAV_CMD.MAV_CMD_DO_SET_SERVO;
+        stop_sound.param1 = 6;
+        stop_sound.param2 = 0;
+        list.add(stop_sound);
 
-        list.addAll((new CameraTriggerImpl(missionImpl, (0.0)).packMissionItem()));
+        //list.addAll((new CameraTriggerImpl(missionImpl, (0.0)).packMissionItem()));
     }
 
     protected msg_mission_item getSurveyPoint(LatLong point, double altitude) {

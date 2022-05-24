@@ -19,6 +19,10 @@ public class StateActions {
     public static final String ACTION_SET_VEHICLE_HOME = Utils.PACKAGE_NAME + ".action.SET_VEHICLE_HOME";
     public static final String EXTRA_VEHICLE_HOME_LOCATION = "extra_vehicle_home_location";
 
+//    public static final String ACTION_DO_SET_SERVO = Utils.PACKAGE_NAME + ".action.DO_SET_SERVO";
+//    public static final String EXTRA_SERVO_VALUE = "extra_vehicle_servo_value";
+//    public static final String EXTRA_SERVO_PWM_VALUE = "extra_vehicle_servo_pwm_value";
+
     public static final String ACTION_ENABLE_RETURN_TO_ME = Utils.PACKAGE_NAME + ".action.ENABLE_RETURN_TO_ME";
     public static final String EXTRA_IS_RETURN_TO_ME_ENABLED = "extra_is_return_to_me_enabled";
 

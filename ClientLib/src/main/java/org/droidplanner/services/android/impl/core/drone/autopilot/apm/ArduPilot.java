@@ -42,6 +42,8 @@ import org.droidplanner.services.android.impl.core.drone.variables.calibration.A
 import org.droidplanner.services.android.impl.core.drone.variables.calibration.MagnetometerCalibrationImpl;
 import org.droidplanner.services.android.impl.core.mission.MissionImpl;
 import org.droidplanner.services.android.impl.core.model.AutopilotWarningParser;
+
+import com.o3dr.android.client.Drone;
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.action.ControlActions;
@@ -436,6 +438,7 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
                     break;
 
                 case msg_servo_output_raw.MAVLINK_MSG_ID_SERVO_OUTPUT_RAW:
+                    Drone.soundEnabled = rc.out[5] > 1500;
                     rc.setRcOutputValues((msg_servo_output_raw) message);
                     break;
 

@@ -2,6 +2,8 @@ package com.o3dr.android.client.apis;
 
 import android.os.Bundle;
 
+import com.MAVLink.common.msg_command_long;
+import com.MAVLink.enums.MAV_CMD;
 import com.o3dr.android.client.Drone;
 import com.o3dr.services.android.lib.coordinate.LatLongAlt;
 import com.o3dr.services.android.lib.drone.connection.ConnectionParameter;
@@ -15,6 +17,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import static com.o3dr.services.android.lib.drone.action.ConnectionActions.ACTION_CONNECT;
 import static com.o3dr.services.android.lib.drone.action.ConnectionActions.ACTION_DISCONNECT;
 import static com.o3dr.services.android.lib.drone.action.ConnectionActions.EXTRA_CONNECT_PARAMETER;
+import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.ACTION_SET_SERVO;
+import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXTRA_SERVO_CHANNEL;
+import static com.o3dr.services.android.lib.drone.action.ExperimentalActions.EXTRA_SERVO_PWM;
 import static com.o3dr.services.android.lib.drone.action.ParameterActions.ACTION_REFRESH_PARAMETERS;
 import static com.o3dr.services.android.lib.drone.action.ParameterActions.ACTION_WRITE_PARAMETERS;
 import static com.o3dr.services.android.lib.drone.action.ParameterActions.EXTRA_PARAMETERS;
@@ -30,6 +35,8 @@ import static com.o3dr.services.android.lib.drone.action.StateActions.EXTRA_VEHI
 import static com.o3dr.services.android.lib.drone.action.StateActions.EXTRA_VEHICLE_HOME_LOCATION;
 import static com.o3dr.services.android.lib.drone.action.StateActions.EXTRA_VEHICLE_MODE;
 
+import org.droidplanner.services.android.impl.core.MAVLink.command.doCmd.MavLinkDoCmds;
+
 /**
  * Provides access to the vehicle specific functionality.
  */
@@ -42,6 +49,7 @@ public class VehicleApi extends Api {
             return new VehicleApi(drone);
         }
     };
+
 
     /**
      * Retrieves a vehicle api instance.
@@ -162,6 +170,21 @@ public class VehicleApi extends Api {
         Bundle params = new Bundle();
         params.putParcelable(EXTRA_VEHICLE_HOME_LOCATION, homeLocation);
         drone.performAsyncActionOnDroneThread(new Action(ACTION_SET_VEHICLE_HOME, params), listener);
+    }
+
+    /**
+     * Changes the vehicle servo value
+     *
+     * @param servo Servo num.
+     * @param value Value to set (900-2100).
+     */
+    public void setServo(final Integer servo, final Integer value, final AbstractCommandListener listener) {
+        Bundle params = new Bundle();
+        params.putInt(EXTRA_SERVO_CHANNEL, servo);
+        params.putInt(EXTRA_SERVO_PWM, value);
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_SET_SERVO, params), listener);
+
+
     }
 
     /**
