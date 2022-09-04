@@ -621,7 +621,9 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
             case MISSION_RECEIVED:
                 droneEvent = AttributeEvent.MISSION_RECEIVED;
                 break;
-
+            case MISSION_ITEM_RECEIVED:
+                droneEvent = AttributeEvent.MISSION_ITEM_RECEIVED;
+                break;
             case FIRMWARE:
             case TYPE:
                 droneEvent = AttributeEvent.TYPE_UPDATED;

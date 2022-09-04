@@ -83,6 +83,8 @@ public class Drone {
     public static final double COLLISION_DANGEROUS_SPEED_METERS_PER_SECOND = -3.0;
     public static final double COLLISION_SAFE_ALTITUDE_METERS = 1.0;
     public static boolean g = true;
+    public static int loadedPointsCounter = 0;
+    public static int pointsInMission = 0;
 
     public static final String ACTION_GROUND_COLLISION_IMMINENT = CLAZZ_NAME + ".ACTION_GROUND_COLLISION_IMMINENT";
     public static final String EXTRA_IS_GROUND_COLLISION_IMMINENT = "extra_is_ground_collision_imminent";
