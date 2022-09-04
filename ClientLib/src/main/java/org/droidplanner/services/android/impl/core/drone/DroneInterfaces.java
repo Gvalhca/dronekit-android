@@ -97,6 +97,13 @@ public class DroneInterfaces {
         /**
          *
          */
+
+        MISSION_ITEM_SENT,
+
+        /**
+         *
+         */
+
         TYPE,
 
         /**

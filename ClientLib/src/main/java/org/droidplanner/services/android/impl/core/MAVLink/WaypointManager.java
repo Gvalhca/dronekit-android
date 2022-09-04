@@ -212,6 +212,9 @@ public class WaypointManager extends DroneVariable {
                 if (msg.msgid == msg_mission_request.MAVLINK_MSG_ID_MISSION_REQUEST) {
                     startWatchdog();
                     processWaypointToSend((msg_mission_request) msg);
+                    Drone.loadedPointsCounter = writeIndex;
+                    Drone.pointsInMission = mission.size();
+                    myDrone.getMission().onMissionNewItemSent(mission);
                     doWaypointEvent(WaypointEvent_Type.WP_UPLOAD, writeIndex + 1, mission.size());
                     return true;
                 }

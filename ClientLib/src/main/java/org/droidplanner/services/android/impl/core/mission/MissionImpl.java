@@ -212,6 +212,17 @@ public class MissionImpl extends DroneVariable<GenericMavLinkDrone> {
         }
     }
 
+    public void onMissionNewItemSent(List<msg_mission_item> msgs) {
+        if (msgs != null) {
+//            myDrone.processHomeUpdate(msgs.get(0));
+//            msgs.remove(0); // Remove Home waypoint
+//            items.clear();
+//            items.addAll(MissionUtils.processMavLinkMessages(this, msgs));
+            myDrone.notifyDroneEvent(DroneEventsType.MISSION_ITEM_SENT);
+            notifyMissionUpdate();
+        }
+    }
+
     public void onMissionReceived(List<msg_mission_item> msgs) {
         if (msgs != null) {
             myDrone.processHomeUpdate(msgs.get(0));
