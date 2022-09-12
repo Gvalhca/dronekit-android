@@ -527,7 +527,6 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
     protected void processVfrHud(msg_vfr_hud vfrHud) {
         if (vfrHud == null)
             return;
-
         setAltitudeGroundAndAirSpeeds(vfrHud.alt, vfrHud.groundspeed, vfrHud.airspeed, vfrHud.climb);
     }
 

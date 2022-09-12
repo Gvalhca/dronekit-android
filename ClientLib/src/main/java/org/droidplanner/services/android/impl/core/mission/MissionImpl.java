@@ -311,7 +311,7 @@ public class MissionImpl extends DroneVariable<GenericMavLinkDrone> {
         int lastWPIndex = -1;
         for (int i = 0; i<data.size();i++)
         {
-//            System.out.println("############################: point " + i + " BEFORE " + data.get(i).command + " seq: "+ data.get(i).seq);
+            System.out.println("############################: point " + i + " BEFORE " + data.get(i).command + " seq: "+ data.get(i).seq);
             if ( data.get(i).command == MAV_CMD.MAV_CMD_NAV_WAYPOINT){
                 if (firstWPIndex == -1 && i!= 0 ) {         //HOME IS WP 0 !
                     firstWPIndex = i;
@@ -320,9 +320,9 @@ public class MissionImpl extends DroneVariable<GenericMavLinkDrone> {
             }
         }
 
-        if (firstWPIndex != -1 && data.size() > firstWPIndex + 1  ) {
+        if (firstWPIndex != -1 && data.size() > firstWPIndex + 1  && data.size() > lastWPIndex + 1) {
             boolean needToAddServos = data.get(firstWPIndex + 1).command != MAV_CMD.MAV_CMD_DO_SET_SERVO
-                    || data.get(lastWPIndex - 1).command != MAV_CMD.MAV_CMD_DO_SET_SERVO;
+                    || data.get(lastWPIndex + 1).command != MAV_CMD.MAV_CMD_DO_SET_SERVO;
             if (needToAddServos) {
                 msg_mission_item turnOnSound = new msg_mission_item();
                 turnOnSound.command = MAV_CMD.MAV_CMD_DO_SET_SERVO;
@@ -334,15 +334,15 @@ public class MissionImpl extends DroneVariable<GenericMavLinkDrone> {
                 turnOffSound.command = MAV_CMD.MAV_CMD_DO_SET_SERVO;
                 turnOffSound.param1 = 6;
                 turnOffSound.param2 = 0;
-                data.add(lastWPIndex + 1, turnOffSound);
+                data.add(lastWPIndex + 2, turnOffSound);
             }
         }
         for (int i = 0; i<data.size();i++){
             data.get(i).seq = i;
         }
-//        for (int i = 0; i<data.size();i++){
-//            System.out.println("############################: point " + i + " AFTER " + data.get(i).command + " seq: "+ data.get(i).seq);
-//        }
+        for (int i = 0; i<data.size();i++){
+            System.out.println("############################: point " + i + " AFTER " + data.get(i).command + " seq: "+ data.get(i).seq);
+        }
 
         return data;
     }
