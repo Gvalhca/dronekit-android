@@ -74,6 +74,8 @@ public class AttributeEvent {
     public static final String MISSION_DRONIE_CREATED = PACKAGE_NAME + ".MISSION_DRONIE_CREATED";
     public static final String MISSION_SENT = PACKAGE_NAME + ".MISSION_SENT";
     public static final String MISSION_RECEIVED = PACKAGE_NAME + ".MISSION_RECEIVED";
+    public static final String MISSION_ITEM_RECEIVED = PACKAGE_NAME + ".MISSION_ITEM_RECEIVED";
+    public static final String MISSION_ITEM_SENT = PACKAGE_NAME + ".MISSION_ITEM_SENT";
     public static final String MISSION_ITEM_UPDATED = PACKAGE_NAME + ".MISSION_ITEM_UPDATED";
     public static final String MISSION_ITEM_REACHED = PACKAGE_NAME + ".MISSION_ITEM_REACHED";
 

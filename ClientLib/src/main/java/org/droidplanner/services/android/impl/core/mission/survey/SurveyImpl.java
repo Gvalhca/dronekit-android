@@ -80,10 +80,11 @@ public class SurveyImpl extends MissionItemImpl {
             //list.addAll(camTrigger.packMissionItem());
         }
 
-        msg_mission_item start_sound = new msg_mission_item();
-        start_sound.command = MAV_CMD.MAV_CMD_DO_SET_SERVO;
-        start_sound.param1 = 6;
-        start_sound.param2 = 20000;
+//        msg_mission_item start_sound = new msg_mission_item();
+//        start_sound.command = MAV_CMD.MAV_CMD_DO_SET_SERVO;
+//        start_sound.param1 = 6;
+//        start_sound.param2 = 20000;
+
 //
 //        msg_mission_item stop_sound = list.get(0);
 //        stop_sound.command = MAV_CMD.MAV_CMD_DO_SET_SERVO;
@@ -105,16 +106,16 @@ public class SurveyImpl extends MissionItemImpl {
                 list.add(yawMsg);
             }
 
-            if (addToFirst) {
-                list.add(start_sound);
-                addToFirst = false;
-            }
+//            if (addToFirst) {
+//                list.add(start_sound);
+//                addToFirst = false;
+//            }
         }
-        msg_mission_item stop_sound = new msg_mission_item();
-        stop_sound.command = MAV_CMD.MAV_CMD_DO_SET_SERVO;
-        stop_sound.param1 = 6;
-        stop_sound.param2 = 0;
-        list.add(stop_sound);
+//        msg_mission_item stop_sound = new msg_mission_item();
+//        stop_sound.command = MAV_CMD.MAV_CMD_DO_SET_SERVO;
+//        stop_sound.param1 = 6;
+//        stop_sound.param2 = 0;
+//        list.add(stop_sound);
 
         //list.addAll((new CameraTriggerImpl(missionImpl, (0.0)).packMissionItem()));
     }

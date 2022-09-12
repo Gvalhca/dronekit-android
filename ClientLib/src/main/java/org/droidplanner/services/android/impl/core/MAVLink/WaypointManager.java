@@ -1,5 +1,7 @@
 package org.droidplanner.services.android.impl.core.MAVLink;
 
+import static com.o3dr.android.client.Drone.LongPressState.NO_SELECTED;
+
 import android.os.Handler;
 
 import com.MAVLink.Messages.MAVLinkMessage;
@@ -9,6 +11,7 @@ import com.MAVLink.common.msg_mission_current;
 import com.MAVLink.common.msg_mission_item;
 import com.MAVLink.common.msg_mission_item_reached;
 import com.MAVLink.common.msg_mission_request;
+import com.o3dr.android.client.Drone;
 
 import org.droidplanner.services.android.impl.core.drone.DroneInterfaces.OnWaypointManagerListener;
 import org.droidplanner.services.android.impl.core.drone.DroneVariable;
@@ -187,6 +190,10 @@ public class WaypointManager extends DroneVariable {
                     processReceivedWaypoint((msg_mission_item) msg);
                     doWaypointEvent(WaypointEvent_Type.WP_DOWNLOAD, readIndex + 1, waypointCount);
                     if (mission.size() < waypointCount) {
+                        Drone.loadedPointsCounter = mission.size();
+                        Drone.pointsInMission = waypointCount;
+                        myDrone.getMission().onMissionNewItemReceived(mission);
+//                        Drone.currentLongPressState = NO_SELECTED;
                         MavLinkWaypoint.requestWayPoint(myDrone, mission.size());
                     } else {
                         stopWatchdog();
@@ -205,6 +212,9 @@ public class WaypointManager extends DroneVariable {
                 if (msg.msgid == msg_mission_request.MAVLINK_MSG_ID_MISSION_REQUEST) {
                     startWatchdog();
                     processWaypointToSend((msg_mission_request) msg);
+                    Drone.loadedPointsCounter = writeIndex;
+                    Drone.pointsInMission = mission.size();
+                    myDrone.getMission().onMissionNewItemSent(mission);
                     doWaypointEvent(WaypointEvent_Type.WP_UPLOAD, writeIndex + 1, mission.size());
                     return true;
                 }
