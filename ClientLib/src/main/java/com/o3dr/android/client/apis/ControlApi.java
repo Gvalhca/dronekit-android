@@ -23,6 +23,7 @@ import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_AL
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_DO_ENABLE;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_FORCE_GUIDED_POINT;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_GUIDED_POINT;
+import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_GUIDED_POINT_ALT;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_LOOK_AT_TARGET;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_VELOCITY_X;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.EXTRA_VELOCITY_Y;
@@ -97,6 +98,14 @@ public class ControlApi extends Api {
         Bundle params = new Bundle();
         params.putBoolean(EXTRA_FORCE_GUIDED_POINT, force);
         params.putParcelable(EXTRA_GUIDED_POINT, point);
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_SEND_GUIDED_POINT, params), listener);
+    }
+
+    public void goTo(LatLong point, double alt, boolean force, AbstractCommandListener listener) {
+        Bundle params = new Bundle();
+        params.putBoolean(EXTRA_FORCE_GUIDED_POINT, force);
+        params.putParcelable(EXTRA_GUIDED_POINT, point);
+        params.putDouble(EXTRA_GUIDED_POINT_ALT, alt);
         drone.performAsyncActionOnDroneThread(new Action(ACTION_SEND_GUIDED_POINT, params), listener);
     }
 

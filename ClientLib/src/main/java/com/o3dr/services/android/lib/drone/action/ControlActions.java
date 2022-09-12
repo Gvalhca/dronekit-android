@@ -13,7 +13,9 @@ public class ControlActions {
     public static final String EXTRA_ALTITUDE = "extra_altitude";
 
     public static final String ACTION_SEND_GUIDED_POINT = Utils.PACKAGE_NAME + ".action.SEND_GUIDED_POINT";
+    public static final String ACTION_SEND_GUIDED_POINT_WITH_ALT = Utils.PACKAGE_NAME + ".action.SEND_GUIDED_POINT_WITH_ALT";
     public static final String EXTRA_GUIDED_POINT = "extra_guided_point";
+    public static final String EXTRA_GUIDED_POINT_ALT = "extra_guided_point_alt";
 
     public static final String EXTRA_FORCE_GUIDED_POINT = "extra_force_guided_point";
     public static final String ACTION_SET_GUIDED_ALTITUDE = Utils.PACKAGE_NAME + ".action.SET_GUIDED_ALTITUDE";

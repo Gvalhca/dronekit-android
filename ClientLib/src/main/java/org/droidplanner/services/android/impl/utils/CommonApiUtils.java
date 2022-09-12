@@ -828,6 +828,22 @@ public class CommonApiUtils {
         }
     }
 
+    public static void sendGuidedPoint(MavLinkDrone drone, LatLong point, double alt, boolean force, ICommandListener listener) {
+        if (drone == null)
+            return;
+
+        GuidedPoint guidedPoint = drone.getGuidedPoint();
+        if (guidedPoint.isInitialized()) {
+            guidedPoint.newGuidedCoord(point);
+        } else if (force) {
+            try {
+                guidedPoint.forcedGuidedCoordinate(point, alt, listener);
+            } catch (Exception e) {
+                Timber.e(e, e.getMessage());
+            }
+        }
+    }
+
     public static void sendLookAtTarget(final MavLinkDrone drone, final LatLongAlt target, final boolean force, final ICommandListener listener){
         if(drone == null)
             return;
