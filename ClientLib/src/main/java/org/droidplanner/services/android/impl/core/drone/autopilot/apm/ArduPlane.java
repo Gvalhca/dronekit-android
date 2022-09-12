@@ -57,7 +57,8 @@ public class ArduPlane extends ArduPilot {
 
         super.processGlobalPositionInt(gpi);
 
-        final double relativeAlt = gpi.relative_alt / 1000.0;
+        // RELATIVE_ALTITUDE CHANGED HERE!!!!!!
+        final double relativeAlt = gpi.alt / 1000.0;
 
         final double groundSpeedX = gpi.vx / 100.0;
         final double groundSpeedY = gpi.vy / 100.0;
