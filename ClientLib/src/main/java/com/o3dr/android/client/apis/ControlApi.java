@@ -16,6 +16,7 @@ import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_E
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_LOOK_AT_TARGET;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SEND_BRAKE_VEHICLE;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SEND_GUIDED_POINT;
+import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SEND_GUIDED_POINT_WITH_ALT;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SET_CONDITION_YAW;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SET_GUIDED_ALTITUDE;
 import static com.o3dr.services.android.lib.drone.action.ControlActions.ACTION_SET_VELOCITY;
@@ -106,7 +107,7 @@ public class ControlApi extends Api {
         params.putBoolean(EXTRA_FORCE_GUIDED_POINT, force);
         params.putParcelable(EXTRA_GUIDED_POINT, point);
         params.putDouble(EXTRA_GUIDED_POINT_ALT, alt);
-        drone.performAsyncActionOnDroneThread(new Action(ACTION_SEND_GUIDED_POINT, params), listener);
+        drone.performAsyncActionOnDroneThread(new Action(ACTION_SEND_GUIDED_POINT_WITH_ALT, params), listener);
     }
 
     /**
