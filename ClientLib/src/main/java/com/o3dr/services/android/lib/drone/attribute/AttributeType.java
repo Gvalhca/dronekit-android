@@ -16,6 +16,10 @@ public class AttributeType {
      */
     public static final String ALTITUDE = PACKAGE_NAME + ".ALTITUDE";
 
+    public static final String RELATIVE_ALTITUDE = PACKAGE_NAME + ".RELATIVE_ALTITUDE";
+
+    public static final String GPI_ALTITUDE = PACKAGE_NAME + ".GPI_ALTITUDE";
+
     /**
      * Used to access the vehicle's attitude state.
      * @see {@link com.o3dr.services.android.lib.drone.property.Attitude}
