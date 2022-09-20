@@ -815,7 +815,7 @@ public class CommonApiUtils {
     public static void sendGuidedPoint(MavLinkDrone drone, LatLong point, boolean force, ICommandListener listener) {
         if (drone == null)
             return;
-
+        MavLinkDoCmds.resetROI(drone, listener);
         GuidedPoint guidedPoint = drone.getGuidedPoint();
         if (guidedPoint.isInitialized()) {
             guidedPoint.newGuidedCoord(point);
@@ -832,6 +832,7 @@ public class CommonApiUtils {
         if (drone == null)
             return;
 
+        MavLinkDoCmds.resetROI(drone, listener);
         GuidedPoint guidedPoint = drone.getGuidedPoint();
         if (guidedPoint.isInitialized()) {
             guidedPoint.newGuidedCoord(point);

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 
 import com.MAVLink.Messages.MAVLinkMessage;
+import com.MAVLink.common.msg_global_position_int;
 import com.github.zafarkhaja.semver.Version;
 import com.o3dr.android.client.apis.CapabilityApi;
 import com.o3dr.services.android.lib.drone.action.ControlActions;
@@ -165,5 +166,23 @@ public class ArduCopter extends ArduPilot {
         }
 
         return true;
+    }
+
+    /**
+     * Used to update the vehicle location, and altitude.
+     * @param gpi
+     */
+    @Override
+    protected void processGlobalPositionInt(msg_global_position_int gpi){
+        if(gpi == null)
+            return;
+
+        super.processGlobalPositionInt(gpi);
+
+        final double relativeAlt = gpi.relative_alt / 1000.0;
+        final double globalAlt = gpi.alt / 1000.0;
+
+        setRelativeAltitude(relativeAlt);
+        setGlobalAltitude(globalAlt);
     }
 }

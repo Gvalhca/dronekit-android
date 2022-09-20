@@ -103,7 +103,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
     private final Parameters parameters = new Parameters();
     protected final Altitude altitude = new Altitude();
     protected final Altitude relativeAltitude = new Altitude();
-    protected final Altitude gpiAltitude = new Altitude();
+    protected final Altitude globalAltitude = new Altitude();
 
     protected final Speed speed = new Speed();
     protected final Battery battery = new Battery();
@@ -555,7 +555,7 @@ public class GenericMavLinkDrone implements MavLinkDrone {
                 return relativeAltitude;
 
             case AttributeType.GPI_ALTITUDE:
-                return gpiAltitude;
+                return globalAltitude;
 
             case AttributeType.STATE:
                 return CommonApiUtils.getState(this, isConnected(), vibration);
@@ -840,15 +840,12 @@ public class GenericMavLinkDrone implements MavLinkDrone {
     protected void processGlobalPositionInt(msg_global_position_int gpi) {
         if (gpi == null)
             return;
-
         double newLat = gpi.lat / 1E7;
         double newLong = gpi.lon / 1E7;
         System.out.println("#################################################### REL ALT:: "+gpi.relative_alt);
         System.out.println("#################################################### ALT:: "+gpi.alt);
         boolean positionUpdated = false;
         LatLong gpsPosition = vehicleGps.getPosition();
-        relativeAltitude.setAltitude(gpi.relative_alt);
-        gpiAltitude.setAltitude(gpi.alt);
         if (gpsPosition == null) {
             gpsPosition = new LatLong(newLat, newLong);
             vehicleGps.setPosition(gpsPosition);

@@ -19,6 +19,16 @@ public class DroneInterfaces {
         ALTITUDE,
 
         /**
+         * Denotes vehicle altitude change event.
+         */
+        RELATIVE_ALTITUDE,
+
+        /**
+         * Denotes vehicle altitude change event.
+         */
+        GLOBAL_ALTITUDE,
+
+        /**
          *
          */
         ORIENTATION,

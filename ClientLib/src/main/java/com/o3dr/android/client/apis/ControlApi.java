@@ -102,11 +102,12 @@ public class ControlApi extends Api {
         drone.performAsyncActionOnDroneThread(new Action(ACTION_SEND_GUIDED_POINT, params), listener);
     }
 
-    public void goTo(LatLong point, double alt, boolean force, AbstractCommandListener listener) {
+    public void goTo(LatLong point, double altInMeters, boolean force, AbstractCommandListener listener) {
+//        double altInMm = altInMeters * 1000.0;
         Bundle params = new Bundle();
         params.putBoolean(EXTRA_FORCE_GUIDED_POINT, force);
         params.putParcelable(EXTRA_GUIDED_POINT, point);
-        params.putDouble(EXTRA_GUIDED_POINT_ALT, alt);
+        params.putDouble(EXTRA_GUIDED_POINT_ALT, altInMeters);
         drone.performAsyncActionOnDroneThread(new Action(ACTION_SEND_GUIDED_POINT_WITH_ALT, params), listener);
     }
 

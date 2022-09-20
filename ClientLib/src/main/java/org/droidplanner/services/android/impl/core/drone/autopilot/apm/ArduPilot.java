@@ -129,6 +129,20 @@ public abstract class ArduPilot extends GenericMavLinkDrone {
         }
     }
 
+    protected void setRelativeAltitude(double relativeAltitude) {
+        if (this.relativeAltitude.getAltitude() != relativeAltitude) {
+            this.relativeAltitude.setAltitude(relativeAltitude);
+            notifyDroneEvent(DroneInterfaces.DroneEventsType.RELATIVE_ALTITUDE);
+        }
+    }
+
+    protected void setGlobalAltitude(double gpiAltitude) {
+        if (this.globalAltitude.getAltitude() != gpiAltitude) {
+            this.globalAltitude.setAltitude(gpiAltitude);
+            notifyDroneEvent(DroneInterfaces.DroneEventsType.GLOBAL_ALTITUDE);
+        }
+    }
+
     @Override
     public WaypointManager getWaypointManager() {
         return waypointManager;

@@ -199,6 +199,8 @@ public class AttributeEvent {
      * Altitude's attribute events.
      */
     public static final String ALTITUDE_UPDATED = PACKAGE_NAME + ".ALTITUDE_UPDATED";
+    public static final String RELATIVE_ALTITUDE_UPDATED = PACKAGE_NAME + ".RELATIVE_ALTITUDE_UPDATED";
+    public static final String GLOBAL_ALTITUDE_UPDATED = PACKAGE_NAME + ".GLOBAL_ALTITUDE_UPDATED";
 
     /**
      * Signals the gimbal orientation was updated.

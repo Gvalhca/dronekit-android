@@ -329,8 +329,8 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener<MavLin
     }
 
     private static double getDroneAltConstrained(MavLinkDrone drone) {
-        final Altitude droneAltitude = (Altitude) drone.getAttribute(AttributeType.ALTITUDE);
-        double alt = Math.floor(droneAltitude.getAltitude());
+        final Altitude droneAltitude = (Altitude) drone.getAttribute(AttributeType.RELATIVE_ALTITUDE);
+        double alt = Math.round(droneAltitude.getAltitude());
         return Math.max(alt, getDefaultMinAltitude(drone));
     }
 

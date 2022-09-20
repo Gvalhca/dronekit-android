@@ -726,6 +726,14 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
                 droneEvent = AttributeEvent.ALTITUDE_UPDATED;
                 break;
 
+            case RELATIVE_ALTITUDE:
+                droneEvent = AttributeEvent.RELATIVE_ALTITUDE_UPDATED;
+                break;
+
+            case GLOBAL_ALTITUDE:
+                droneEvent = AttributeEvent.GLOBAL_ALTITUDE_UPDATED;
+                break;
+
             case WARNING_SIGNAL_WEAK:
                 droneEvent = AttributeEvent.SIGNAL_WEAK;
                 break;
