@@ -312,7 +312,7 @@ public class MissionImpl extends DroneVariable<GenericMavLinkDrone> {
         for (int i = 0; i<data.size();i++)
         {
             System.out.println("############################: point " + i + " BEFORE " + data.get(i).command + " seq: "+ data.get(i).seq);
-            if ( data.get(i).command == MAV_CMD.MAV_CMD_NAV_WAYPOINT){
+            if ( data.get(i).command == MAV_CMD.MAV_CMD_NAV_WAYPOINT || data.get(i).command == MAV_CMD.MAV_CMD_NAV_SPLINE_WAYPOINT){
                 if (firstWPIndex == -1 && i!= 0 ) {         //HOME IS WP 0 !
                     firstWPIndex = i;
                 }
