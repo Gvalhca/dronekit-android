@@ -570,6 +570,10 @@ public final class DroneApi extends IDroneApi.Stub implements DroneInterfaces.On
                 droneEvent = AttributeEvent.GUIDED_POINT_UPDATED;
                 break;
 
+            case ROI_CHANGED:
+                droneEvent = AttributeEvent.ROI_POINT_UPDATED;
+                break;
+
             case RADIO:
                 droneEvent = AttributeEvent.SIGNAL_UPDATED;
                 break;

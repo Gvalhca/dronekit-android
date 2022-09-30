@@ -842,8 +842,6 @@ public class GenericMavLinkDrone implements MavLinkDrone {
             return;
         double newLat = gpi.lat / 1E7;
         double newLong = gpi.lon / 1E7;
-        System.out.println("#################################################### REL ALT:: "+gpi.relative_alt);
-        System.out.println("#################################################### ALT:: "+gpi.alt);
         boolean positionUpdated = false;
         LatLong gpsPosition = vehicleGps.getPosition();
         if (gpsPosition == null) {

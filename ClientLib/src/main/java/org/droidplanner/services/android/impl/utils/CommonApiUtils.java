@@ -43,6 +43,7 @@ import com.o3dr.services.android.lib.model.ICommandListener;
 
 import org.droidplanner.services.android.impl.core.MAVLink.MavLinkCommands;
 import org.droidplanner.services.android.impl.core.MAVLink.command.doCmd.MavLinkDoCmds;
+import org.droidplanner.services.android.impl.core.drone.DroneInterfaces;
 import org.droidplanner.services.android.impl.core.drone.autopilot.Drone;
 import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
 import org.droidplanner.services.android.impl.core.drone.autopilot.apm.ArduPilot;
@@ -386,9 +387,9 @@ public class CommonApiUtils {
                 : null;
 
         return new State(isConnected, CommonApiUtils.getVehicleMode(droneMode), droneState.isArmed(),
-            droneState.isFlying(), droneState.getErrorId(), drone.getMavlinkVersion(), calibrationMessage,
-            droneState.getFlightStartTime(), generateEkfStatus(droneState.getEkfStatus()),
-            isConnected && drone.isConnectionAlive(), vibration);
+                droneState.isFlying(), droneState.getErrorId(), drone.getMavlinkVersion(), calibrationMessage,
+                droneState.getFlightStartTime(), generateEkfStatus(droneState.getEkfStatus()),
+                isConnected && drone.isConnectionAlive(), vibration);
     }
 
     public static EkfStatus generateEkfStatus(msg_ekf_status_report ekfStatus) {
@@ -397,8 +398,8 @@ public class CommonApiUtils {
         }
 
         EkfStatus proxyEkfStatus = new EkfStatus(ekfStatus.flags, ekfStatus.compass_variance,
-            ekfStatus.pos_horiz_variance, ekfStatus.terrain_alt_variance, ekfStatus.velocity_variance,
-            ekfStatus.pos_vert_variance);
+                ekfStatus.pos_horiz_variance, ekfStatus.terrain_alt_variance, ekfStatus.velocity_variance,
+                ekfStatus.pos_vert_variance);
 
         return proxyEkfStatus;
     }
@@ -455,8 +456,13 @@ public class CommonApiUtils {
             guidedCoord = new LatLong(0, 0);
         }
 
+        LatLong roiCoord = guidedPoint.getRoiPoint();
+        if (roiCoord == null) {
+            roiCoord = new LatLong(0, 0);
+        }
+
         double guidedAlt = guidedPoint.getAltitude();
-        return new GuidedState(guidedState, new LatLongAlt(guidedCoord, guidedAlt));
+        return new GuidedState(guidedState, new LatLongAlt(guidedCoord, guidedAlt), new LatLongAlt(roiCoord, guidedAlt));
     }
 
     public static void changeVehicleMode(MavLinkDrone drone, VehicleMode newMode, ICommandListener listener) {
@@ -538,7 +544,7 @@ public class CommonApiUtils {
     }
 
     public static void disableFollowMe(Follow follow) {
-        if(follow != null) {
+        if (follow != null) {
             follow.disableFollowMe();
         }
     }
@@ -817,6 +823,7 @@ public class CommonApiUtils {
             return;
         MavLinkDoCmds.resetROI(drone, listener);
         GuidedPoint guidedPoint = drone.getGuidedPoint();
+        guidedPoint.changeRoiPoint(new LatLongAlt(0, 0, 0));
         if (guidedPoint.isInitialized()) {
             guidedPoint.newGuidedCoord(point);
         } else if (force) {
@@ -834,6 +841,7 @@ public class CommonApiUtils {
 
         MavLinkDoCmds.resetROI(drone, listener);
         GuidedPoint guidedPoint = drone.getGuidedPoint();
+        guidedPoint.changeRoiPoint(new LatLongAlt(0, 0, 0));
         if (guidedPoint.isInitialized()) {
             guidedPoint.newGuidedCoord(point);
         } else if (force) {
@@ -845,18 +853,21 @@ public class CommonApiUtils {
         }
     }
 
-    public static void sendLookAtTarget(final MavLinkDrone drone, final LatLongAlt target, final boolean force, final ICommandListener listener){
-        if(drone == null)
+    public static void sendLookAtTarget(final MavLinkDrone drone, final LatLongAlt target, final boolean force, final ICommandListener listener) {
+        if (drone == null)
             return;
 
         GuidedPoint guidedPoint = drone.getGuidedPoint();
-        if(guidedPoint.isInitialized()){
+        if (guidedPoint.isInitialized()) {
+            drone.notifyDroneEvent(DroneInterfaces.DroneEventsType.ROI_CHANGED);
+            guidedPoint.changeRoiPoint(target);
             MavLinkDoCmds.setROI(drone, target, listener);
-        }
-        else if (force) {
+        } else if (force) {
             GuidedPoint.changeToGuidedMode(drone, new AbstractCommandListener() {
                 @Override
                 public void onSuccess() {
+                    drone.notifyDroneEvent(DroneInterfaces.DroneEventsType.ROI_CHANGED);
+                    guidedPoint.changeRoiPoint(target);
                     MavLinkDoCmds.setROI(drone, target, listener);
                 }
 
@@ -1004,7 +1015,7 @@ public class CommonApiUtils {
     }
 
     public static void startVideoStreamForObserver(Drone drone, String appId, String videoTag,
-                                        ICommandListener listener) {
+                                                   ICommandListener listener) {
         if (!(drone instanceof GenericMavLinkDrone)) {
             postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
             return;
@@ -1015,7 +1026,7 @@ public class CommonApiUtils {
     }
 
     public static void stopVideoStreamForObserver(Drone drone, String appId, String videoTag,
-                                       ICommandListener listener) {
+                                                  ICommandListener listener) {
         if (!(drone instanceof GenericMavLinkDrone)) {
             postErrorEvent(CommandExecutionError.COMMAND_UNSUPPORTED, listener);
             return;

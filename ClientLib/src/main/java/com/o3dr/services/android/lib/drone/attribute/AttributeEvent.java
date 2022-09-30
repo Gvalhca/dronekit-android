@@ -38,14 +38,14 @@ public class AttributeEvent {
     /**
      * Signals completion of the magnetometer calibration.
      *
-     * @see {@link AttributeEventExtra#EXTRA_CALIBRATION_MAG_RESULT}
+     * @see {@link com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra#EXTRA_CALIBRATION_MAG_RESULT}
      */
     public static final String CALIBRATION_MAG_COMPLETED = PACKAGE_NAME + ".CALIBRATION_MAG_COMPLETED";
 
     /**
      * Provides progress updates for the magnetometer calibration.
      *
-     * @see {@link AttributeEventExtra#EXTRA_CALIBRATION_MAG_PROGRESS}
+     * @see {@link com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra#EXTRA_CALIBRATION_MAG_PROGRESS}
      */
     public static final String CALIBRATION_MAG_PROGRESS = PACKAGE_NAME + ".CALIBRATION_MAG_PROGRESS";
 
@@ -66,6 +66,11 @@ public class AttributeEvent {
      * GuidedState attribute events.
      */
     public static final String GUIDED_POINT_UPDATED = PACKAGE_NAME + ".GUIDED_POINT_UPDATED";
+
+    /**
+     * ROI attribute events.
+     */
+    public static final String ROI_POINT_UPDATED = PACKAGE_NAME + ".ROI_POINT_UPDATED";
 
     /**
      * Mission attribute events.
@@ -104,10 +109,10 @@ public class AttributeEvent {
      * fire as many times as the count of the set of parameters being refreshed.
      * Allows listeners to keep track of the parameters refresh progress.
      *
-     * @see {@link AttributeEventExtra#EXTRA_PARAMETER_INDEX}
-     * @see {@link AttributeEventExtra#EXTRA_PARAMETERS_COUNT}
-     * @see {@link AttributeEventExtra#EXTRA_PARAMETER_NAME}
-     * @see {@link AttributeEventExtra#EXTRA_PARAMETER_VALUE}
+     * @see {@link com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra#EXTRA_PARAMETER_INDEX}
+     * @see {@link com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra#EXTRA_PARAMETERS_COUNT}
+     * @see {@link com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra#EXTRA_PARAMETER_NAME}
+     * @see {@link com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra#EXTRA_PARAMETER_VALUE}
      */
     public static final String PARAMETER_RECEIVED = PACKAGE_NAME + ".PARAMETERS_RECEIVED";
 
@@ -205,9 +210,9 @@ public class AttributeEvent {
     /**
      * Signals the gimbal orientation was updated.
      *
-     * @see {@link AttributeEventExtra#EXTRA_GIMBAL_ORIENTATION_PITCH}
-     * @see {@link AttributeEventExtra#EXTRA_GIMBAL_ORIENTATION_ROLL}
-     * @see {@link AttributeEventExtra#EXTRA_GIMBAL_ORIENTATION_YAW}
+     * @see {@link com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra#EXTRA_GIMBAL_ORIENTATION_PITCH}
+     * @see {@link com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra#EXTRA_GIMBAL_ORIENTATION_ROLL}
+     * @see {@link com.o3dr.services.android.lib.drone.attribute.AttributeEventExtra#EXTRA_GIMBAL_ORIENTATION_YAW}
      */
     public static final String GIMBAL_ORIENTATION_UPDATED = PACKAGE_NAME + ".GIMBAL_ORIENTATION_UPDATED";
 

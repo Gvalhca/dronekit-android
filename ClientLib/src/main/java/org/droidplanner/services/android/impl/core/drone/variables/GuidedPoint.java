@@ -9,6 +9,7 @@ import org.droidplanner.services.android.impl.core.drone.DroneInterfaces.OnDrone
 import org.droidplanner.services.android.impl.core.drone.DroneVariable;
 import org.droidplanner.services.android.impl.core.drone.autopilot.Drone;
 import org.droidplanner.services.android.impl.core.drone.autopilot.MavLinkDrone;
+
 import com.o3dr.services.android.lib.coordinate.LatLong;
 import com.o3dr.services.android.lib.drone.attribute.AttributeType;
 import com.o3dr.services.android.lib.drone.attribute.error.CommandExecutionError;
@@ -24,6 +25,8 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener<MavLin
     private GuidedStates state = GuidedStates.UNINITIALIZED;
     private LatLong coord = new LatLong(0, 0);
     private double altitude = 0.0; //altitude in meters
+
+    private LatLong roiPoint = new LatLong(0, 0);
 
     private Runnable mPostInitializationTask;
 
@@ -334,6 +337,14 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener<MavLin
         return Math.max(alt, getDefaultMinAltitude(drone));
     }
 
+    public LatLong getRoiPoint() {
+        return roiPoint;
+    }
+
+    public void changeRoiPoint(LatLong roiPoint) {
+        this.roiPoint = roiPoint;
+    }
+
     public LatLong getCoord() {
         return coord;
     }
@@ -361,7 +372,7 @@ public class GuidedPoint extends DroneVariable implements OnDroneListener<MavLin
     public static float getDefaultMinAltitude(MavLinkDrone drone) {
         final int droneType = drone.getType();
         if (Type.isCopter(droneType)) {
-            return 2f;
+            return 5f;
         } else if (Type.isPlane(droneType)) {
             return 15f;
         } else {
